@@ -1,0 +1,2339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LA28 Olympics Experience Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #0A0A0F;
+      --surface: #141419;
+      --surface-hover: #1C1C24;
+      --surface-active: #24242E;
+      --border: #2A2A35;
+      --border-subtle: #1E1E28;
+      --text: #F0F0F5;
+      --text-secondary: #9090A0;
+      --text-tertiary: #606070;
+      --accent: #FF6B2B;
+      --accent-glow: rgba(255, 107, 43, 0.15);
+      --accent-muted: #CC5522;
+      --gradient-primary: linear-gradient(135deg, #FF15CB, #FE5088, #FE834E, #FDA824, #FDC800, #3FFFEC);
+      --blue: #0081C8;
+      --red: #EE334E;
+      --green: #00A651;
+      --yellow: #FCB131;
+      --shadow-card: 0 4px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05);
+      --shadow-elevated: 0 12px 48px rgba(0,0,0,0.6);
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Chakra Petch', sans-serif;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    /* Layout */
+    .app-container {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+
+    .sidebar {
+      width: 240px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 80px;
+    }
+
+    .sidebar-header svg {
+      width: 120px;
+      height: auto;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 0;
+    }
+
+    .nav-item {
+      padding: 12px 16px;
+      margin: 0 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text-secondary);
+      border-left: 3px solid transparent;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-item:hover {
+      background: var(--surface-hover);
+      color: var(--text);
+    }
+
+    .nav-item.active {
+      background: var(--accent-glow);
+      color: var(--accent);
+      border-left-color: var(--accent);
+      font-weight: 600;
+    }
+
+    .nav-icon {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-hub {
+      padding: 20px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hub-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: 8px;
+    }
+
+    .hub-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      padding: 8px 12px;
+      background: var(--surface-hover);
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .credential-btn {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .credential-btn:hover {
+      filter: brightness(1.1);
+    }
+
+    /* Main content */
+    .content-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .content-view {
+      flex: 1;
+      overflow-y: auto;
+      display: none;
+    }
+
+    .content-view.active {
+      display: block;
+    }
+
+    /* Onboarding */
+    .onboarding-container {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 1000;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .onboarding-container.active {
+      display: flex;
+    }
+
+    .onboarding-screen {
+      display: none;
+      text-align: center;
+      width: 100%;
+      max-width: 500px;
+      padding: 40px;
+    }
+
+    .onboarding-screen.active {
+      display: block;
+    }
+
+    .welcome-logo-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0 auto 30px;
+    }
+    .welcome-logo-wrap .la-text {
+      width: 150px;
+      height: auto;
+    }
+    .welcome-logo-wrap .rings {
+      width: 180px;
+      height: auto;
+      margin-top: -10px;
+    }
+
+    .onboarding-h1 {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+
+    .onboarding-subtitle {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+
+    .language-selector {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 32px;
+      justify-content: center;
+    }
+
+    .lang-option {
+      padding: 10px 20px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-secondary);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .lang-option.selected {
+      background: var(--accent-glow);
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .role-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .role-card {
+      padding: 24px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+    }
+
+    .role-card:hover {
+      border-color: var(--text);
+      background: var(--surface-hover);
+    }
+
+    .role-card.selected {
+      border-color: var(--accent);
+      background: var(--accent-glow);
+    }
+
+    .role-icon {
+      width: 40px;
+      height: 40px;
+      margin-bottom: 12px;
+      opacity: 0.7;
+    }
+
+    .role-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .role-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .btn-primary {
+      padding: 12px 32px;
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+    }
+
+    /* Card styles */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-card);
+    }
+
+    .card:hover {
+      background: var(--surface-hover);
+    }
+
+    .card.expandable {
+      cursor: pointer;
+    }
+
+    .card.expanded {
+      border-color: var(--accent);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4), 0 0 0 2px rgba(255, 107, 43, 0.3);
+    }
+
+    /* Badge styles */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: var(--surface-active);
+      color: var(--text-secondary);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge.crowd-low { background: #3DDC8422; color: #3DDC84; }
+    .badge.crowd-moderate { background: #FFB74D22; color: #FFB74D; }
+    .badge.crowd-high { background: #FF8A6522; color: #FF8A65; }
+    .badge.crowd-extreme { background: #FF525222; color: #FF5252; }
+
+    .badge.transit {
+      background: var(--surface-active);
+      color: white;
+      font-weight: 700;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      justify-content: center;
+    }
+
+    /* Grid layouts */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .space-y-12 > * + * {
+      margin-top: 12px;
+    }
+
+    .space-y-16 > * + * {
+      margin-top: 16px;
+    }
+
+    .space-y-20 > * + * {
+      margin-top: 20px;
+    }
+
+    /* Typography */
+    .label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .title-large {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .title-medium {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .title-small {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .text-secondary {
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    .text-tertiary {
+      color: var(--text-tertiary);
+      font-size: 12px;
+    }
+
+    .accent { color: var(--accent); }
+
+    /* Modal / Credential */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(16px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 32px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: var(--shadow-elevated);
+    }
+
+    .modal-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .modal-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .modal-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .qr-container {
+      width: 180px;
+      height: 180px;
+      margin: 0 auto 24px;
+      background: white;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qr-container svg {
+      width: 140px;
+      height: 140px;
+    }
+
+    .access-zones {
+      margin-bottom: 20px;
+    }
+
+    .zones-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .zone-tag {
+      padding: 4px 10px;
+      background: var(--surface-active);
+      color: var(--text-secondary);
+      border-radius: 6px;
+      font-size: 12px;
+    }
+
+    .meal-balance {
+      padding: 12px 16px;
+      background: var(--surface-hover);
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .meal-amount {
+      font-size: 20px;
+      font-weight: 700;
+      color: #3DDC84;
+    }
+
+    .olympic-stripe {
+      display: flex;
+      gap: 6px;
+      margin-top: 20px;
+    }
+
+    .stripe-bar {
+      flex: 1;
+      height: 4px;
+      border-radius: 2px;
+    }
+
+    /* Map */
+    #map {
+      width: 100%;
+      height: 100%;
+      background: var(--surface);
+    }
+
+    .mapboxgl-map {
+      background: var(--surface);
+    }
+    .mapboxgl-popup-content {
+      background: var(--surface);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 13px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      border: 1px solid var(--border);
+    }
+    .mapboxgl-popup-tip {
+      border-top-color: var(--surface);
+    }
+    .mapboxgl-popup-close-button {
+      color: var(--text-secondary);
+      font-size: 18px;
+      padding: 4px 8px;
+    }
+    .mapboxgl-ctrl-attrib {
+      background: transparent !important;
+      font-size: 10px;
+      opacity: 0.5;
+    }
+    .station-dot {
+      width: 8px; height: 8px; border-radius: 50%; border: 2px solid; cursor: pointer; transition: transform 0.15s;
+    }
+    .station-dot:hover { transform: scale(1.5); }
+    .venue-dot {
+      width: 14px; height: 14px; border-radius: 50%; background: #FF6B2B; border: 2px solid rgba(255,107,43,0.4); cursor: pointer; box-shadow: 0 0 8px rgba(255,107,43,0.4); transition: transform 0.15s;
+    }
+    .venue-dot:hover { transform: scale(1.3); }
+    .poi-dot {
+      width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.25); cursor: pointer; transition: transform 0.15s;
+    }
+    .poi-dot:hover { transform: scale(1.4); }
+
+    .map-controls {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 10;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .map-control-toggle {
+      padding: 8px 12px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-secondary);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .map-control-toggle.active {
+      background: var(--accent-glow);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .venue-detail {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      max-width: 280px;
+      box-shadow: var(--shadow-card);
+      z-index: 10;
+    }
+
+    .venue-detail h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .venue-detail p {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    /* Calendar grid */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 32px;
+    }
+
+    .calendar-day {
+      padding: 12px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .calendar-day:hover {
+      border-color: var(--text);
+    }
+
+    .calendar-day.selected {
+      border-color: var(--accent);
+      background: var(--accent-glow);
+      color: var(--accent);
+    }
+
+    .calendar-day-num {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin-bottom: 4px;
+    }
+
+    /* Filters */
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      padding: 6px 12px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--text-tertiary);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .pill:hover {
+      border-color: var(--text);
+    }
+
+    .pill.active {
+      border-color: var(--accent);
+      background: rgba(255, 107, 43, 0.15);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Event rows */
+    .event-row {
+      display: grid;
+      grid-template-columns: 80px 1fr 80px 100px;
+      gap: 16px;
+      align-items: center;
+      padding: 16px 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .event-row:hover {
+      background: var(--surface-hover);
+    }
+
+    .event-time {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .event-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .event-sport {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+    }
+
+    .event-round {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .event-venue {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* Explore cards */
+    .explore-card {
+      padding: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .explore-card:hover {
+      background: var(--surface-hover);
+      border-color: var(--text);
+    }
+
+    .explore-tag {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
+    }
+
+    .explore-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .explore-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .explore-meta {
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
+
+    /* Group members */
+    .member-row {
+      display: grid;
+      grid-template-columns: 1fr 100px 80px;
+      gap: 16px;
+      align-items: center;
+      padding: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .member-name {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .member-email {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .member-status {
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      background: var(--surface-active);
+      color: var(--text-secondary);
+    }
+
+    .member-status.confirmed {
+      background: rgba(61, 220, 132, 0.15);
+      color: #3DDC84;
+    }
+
+    /* Weather strip */
+    .weather-strip {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      background: rgba(252, 177, 49, 0.1);
+      border: 1px solid rgba(252, 177, 49, 0.2);
+    }
+
+    .weather-temp {
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    /* Alert banner */
+    .alert-banner {
+      display: flex;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      background: rgba(252, 177, 49, 0.1);
+      border: 1px solid rgba(252, 177, 49, 0.25);
+    }
+
+    .alert-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #FFB74D;
+    }
+
+    .alert-body {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .alert-time {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      white-space: nowrap;
+    }
+
+    /* Route strip */
+    .route-strip {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      overflow-x: auto;
+    }
+
+    .route-step {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(96, 112, 112, 0.15);
+      font-size: 11px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .route-divider {
+      width: 16px;
+      height: 2px;
+      background: var(--border);
+      margin: 0 4px;
+    }
+
+    /* Content padding */
+    .content-pad {
+      padding: 32px 40px;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-tertiary);
+    }
+
+    /* Row with time, sport info, crowd, tickets */
+    .journey-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      overflow: hidden;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-card);
+    }
+
+    .journey-card:hover {
+      background: var(--surface-hover);
+    }
+
+    .journey-card.expanded {
+      border-color: var(--accent);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4), 0 0 0 2px rgba(255, 107, 43, 0.3);
+    }
+
+    .journey-header {
+      padding: 16px 20px;
+    }
+
+    .journey-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .journey-sport-title {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .journey-sport {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+    }
+
+    .journey-round {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .journey-time {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      text-align: right;
+    }
+
+    .journey-time-big {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .journey-time-small {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .journey-details {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .journey-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .journey-expanded {
+      border-top: 1px solid var(--border);
+      padding: 16px 20px;
+      background: var(--surface-hover);
+    }
+
+    .route-detail-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .route-detail-step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .route-detail-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(96, 112, 112, 0.15);
+      flex-shrink: 0;
+    }
+
+    .route-detail-text {
+      flex: 1;
+    }
+
+    .route-detail-text p {
+      font-size: 14px;
+      color: var(--text);
+      margin: 0;
+    }
+
+    .route-detail-duration {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .journey-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .btn-add {
+      flex: 1;
+      padding: 12px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-add:hover {
+      filter: brightness(1.1);
+    }
+
+    .btn-close {
+      flex: 1;
+      padding: 12px;
+      background: var(--surface-active);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-close:hover {
+      background: var(--surface);
+    }
+
+    /* Volunteer/Athlete Hubs */
+    .shift-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 100px;
+      gap: 16px;
+      align-items: center;
+      padding: 16px 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .shift-time {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .shift-venue {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .shift-task {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .shift-status {
+      padding: 4px 8px;
+      background: var(--surface-active);
+      border-radius: 4px;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .shift-status.confirmed {
+      background: rgba(61, 220, 132, 0.15);
+      color: #3DDC84;
+    }
+
+    .shift-status.pending {
+      background: rgba(255, 183, 77, 0.15);
+      color: #FFB74D;
+    }
+
+    .meal-section {
+      padding: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .meal-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .meal-amount-big {
+      font-size: 28px;
+      font-weight: 700;
+      color: #3DDC84;
+      margin-bottom: 8px;
+    }
+
+    .meal-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .hr {
+      height: 1px;
+      background: var(--border);
+      margin: 20px 0;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="onboarding-container active" id="onboarding">
+  <div class="onboarding-screen active" id="screen-welcome">
+    <div class="welcome-logo-wrap">
+      <svg class="la-text" viewBox="0 0 400 448" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M181.753 238.292C181.935 243.306 178.055 247.511 173.082 247.693C172.848 247.693 172.613 247.693 172.379 247.693H9.37991C4.38058 247.876 0.188435 243.985 0.00616793 238.997C0.00616793 238.762 0.00616793 238.527 0.00616793 238.292V74.5472C-0.176099 69.533 3.70359 65.3284 8.67688 65.1456C8.91122 65.1456 9.14556 65.1456 9.37991 65.1456H69.7884C74.7878 64.9628 78.9799 68.854 79.1622 73.8421C79.1622 74.0771 79.1622 74.3122 79.1622 74.5472V168.824C78.8758 173.134 82.1045 176.894 86.4268 177.181C86.7914 177.208 87.1559 177.208 87.4944 177.181H172.379C177.378 176.999 181.57 180.89 181.753 185.878C181.753 186.113 181.753 186.348 181.753 186.583V238.292ZM116.918 329.696V319.772L110.408 313.244H67.445L60.9355 319.772V330.219H0.00616793V288.695L27.6066 261.012H154.412L182.013 288.695V348.761L163.526 367.303L83.5887 390.285H182.013V443.56H0.00616793V377.749L18.4933 359.207L116.918 329.696ZM221.07 352.678C199.459 345.105 190.085 332.047 190.085 312.982C190.085 277.465 221.07 259.184 287.988 259.184C354.906 259.184 385.892 277.726 385.892 312.982C385.892 332.047 376.518 345.105 354.906 352.678C378.341 360.513 388.496 374.354 388.496 394.463C388.496 429.98 356.989 448 287.988 448C218.987 448 187.481 429.719 187.481 394.463C187.481 374.354 197.636 360.513 221.07 352.678ZM287.988 401.253C307.517 401.253 317.411 396.552 317.411 387.412C317.411 378.271 307.257 373.309 287.988 373.309C268.72 373.309 258.826 378.271 258.826 387.412C258.826 396.552 268.98 401.253 287.988 401.253ZM316.11 318.728C316.11 309.587 306.475 304.887 287.988 304.887C270.282 304.887 260.127 309.849 260.127 318.728C260.127 327.607 270.282 332.83 287.988 332.83C306.215 332.83 316.11 327.868 316.11 318.728ZM373.393 435.987H379.122V436.77H376.778V443.56H375.737V436.77H373.393V435.987ZM381.465 443.56H380.424V435.726H381.726L383.288 438.859L384.85 435.726H386.152V443.299H385.111V437.031L383.288 440.688L381.465 437.031V443.56Z" fill="white"/>
+        <path d="M260.834 3.04988C260.314 2.52732 259.793 2.7886 259.533 2.00476L259.793 1.74347C267.183 2.99763 274.157 6.05462 280.089 10.6271C281.546 11.8028 283.498 12.1947 285.293 11.6722C286.074 11.4109 286.594 11.9335 287.115 12.456C289.197 14.0237 291.538 15.5914 293.62 17.4204C299.084 22.646 305.329 27.3491 307.931 35.1875C309.232 33.6199 310.533 32.836 310.273 31.007C310.325 30.4583 310.507 29.9097 310.794 29.4393C315.269 23.0379 320.916 17.5249 327.447 13.2399C328.436 12.5867 329.633 12.2993 330.83 12.456C332.391 12.9786 333.952 11.9335 335.253 11.1496C339.677 8.5368 345.141 8.5368 349.825 7.23039C349.304 7.49167 349.044 8.01424 348.524 8.27552C351.126 8.01424 353.207 5.92398 356.33 7.23039C353.468 9.58193 350.866 12.456 348.263 14.8076C345.089 17.4988 342.591 20.8954 340.978 24.7363C339.416 29.7006 336.814 34.665 336.294 39.8906C334.473 53.216 336.034 66.5414 337.595 79.8667C339.156 93.793 340.978 107.641 343.059 121.411C345.401 136.826 348.524 152.242 351.906 167.657C355.653 184.197 360.337 200.527 365.958 216.517C366.608 218.921 367.128 221.377 367.519 223.833C367.779 225.139 368.039 226.185 369.6 224.617C370.901 223.572 372.463 222.527 374.284 221.22C373.504 224.094 371.422 225.662 370.381 227.752C371.682 227.752 371.942 226.446 372.463 225.923C376.106 222.788 380.529 222.788 384.953 223.049C385.733 223.049 386.514 223.572 387.294 223.049C389.168 221.873 391.458 221.586 393.539 222.265C395.023 222.945 396.792 222.631 397.963 221.481C398.483 220.959 399.264 220.436 399.784 221.22C400.305 222.004 399.784 222.527 399.264 223.049C396.922 226.446 394.32 229.581 391.978 232.978C385.395 241.992 381.102 252.496 379.488 263.548C378.968 266.683 378.187 269.819 377.667 272.954C377.589 275.384 376.184 277.579 374.024 278.702C372.437 279.46 371.084 280.636 370.121 282.099C369.6 283.144 368.56 283.144 367.519 282.883C363.954 281.785 360.103 281.89 356.59 283.144C355.289 283.196 353.988 283.092 352.687 282.883C349.304 283.144 345.922 283.144 342.539 282.883C341.394 282.857 340.327 282.256 339.677 281.315C338.35 279.329 337.387 277.108 336.814 274.783C335.774 270.602 334.473 266.422 333.432 262.241C333.171 261.196 332.911 260.151 333.692 259.367C334.16 258.583 334.264 257.617 333.952 256.755C332.911 257.016 333.692 258.322 332.651 258.845C331.09 253.358 329.789 247.871 328.228 242.123C324.845 229.842 321.983 217.562 319.381 205.282C316.518 192.218 314.697 178.893 311.835 165.828C309.232 153.809 306.891 141.791 304.289 129.772C303.768 127.943 305.329 127.159 305.069 125.33C300.906 104.166 299.865 83.0021 299.084 61.577C299.084 61.0544 299.345 60.0093 298.564 60.0093C297.783 60.0093 298.564 61.0544 297.523 61.3157C295.702 58.7029 293.88 56.0901 292.059 53.216C291.538 52.4321 291.018 51.6483 289.977 51.9096C288.936 52.1709 288.936 53.216 288.936 53.7385C285.814 70.1993 281.911 86.6601 279.048 103.121C276.967 114.356 274.365 125.591 271.502 136.565C270.722 139.178 270.462 141.791 269.941 144.142C269.421 146.494 269.941 147.016 272.283 147.277C274.729 147.486 277.149 147.852 279.569 148.323C280.428 148.166 281.26 148.584 281.651 149.368C278.242 149.106 274.833 149.368 271.502 150.152C273.844 150.674 276.186 151.197 278.268 151.458C286.777 152.895 295.442 153.156 304.028 152.242C304.549 152.242 304.809 151.981 305.069 152.503C305.329 153.026 305.069 153.287 304.809 153.809C304.549 154.332 303.248 155.116 303.248 156.422C303.248 157.206 302.467 157.729 303.768 157.99C304.549 158.251 304.289 159.035 304.028 159.558C303.508 160.603 302.727 162.17 301.686 162.17C300.125 162.17 298.824 163.216 297.523 163.477C298.304 163.477 299.345 163.738 300.125 163.738C293.1 167.396 285.814 164.522 278.788 165.306C282.587 166.456 286.542 167.004 290.498 166.874C294.531 167.344 298.616 166.9 302.467 165.567C302.207 167.919 299.605 167.657 298.824 169.225C300.125 170.009 301.166 167.657 302.727 168.964C298.044 174.477 290.888 177.246 283.732 176.28C287.115 177.586 290.498 176.541 293.88 177.325C291.538 180.722 288.156 180.46 285.033 180.199C278.788 179.938 272.804 179.415 266.559 178.893C265.258 178.631 264.737 179.415 264.477 180.721C263.176 188.299 261.615 195.615 260.314 202.93C259.013 210.246 257.451 217.04 256.15 224.094C255.89 224.878 256.15 225.923 254.849 225.923C253.548 225.923 253.808 226.968 253.808 227.752C253.808 228.536 253.808 229.581 252.507 230.365C255.37 212.859 256.931 195.615 259.273 178.37C257.712 178.893 257.712 179.938 257.712 180.983L253.808 212.337C253.288 216.517 252.507 220.698 251.727 224.878C251.571 226.89 250.634 228.771 249.125 230.104C247.563 231.149 248.344 233.239 250.166 234.023C251.649 234.519 253.054 235.199 254.329 236.113C255.37 236.897 256.931 237.158 258.752 238.203C255.89 238.203 254.329 236.113 251.727 236.636C253.028 238.726 255.37 238.987 257.191 239.771C260.834 241.6 264.997 241.6 268.64 243.429C269.681 243.952 270.982 243.69 271.763 243.952C272.543 244.213 275.145 242.123 275.145 245.258C275.145 245.519 276.446 245.781 276.707 245.519C279.543 244.448 282.691 244.736 285.293 246.303C287.115 247.087 288.936 245.781 290.758 246.042C296.222 246.303 301.166 244.213 306.37 242.907C308.192 242.384 308.712 240.032 311.054 240.032C310.377 242.724 308.686 245.049 306.37 246.565C306.11 246.826 304.549 247.348 306.11 248.132C306.891 248.393 306.11 248.655 305.85 249.177C303.638 251.477 301.296 253.671 298.824 255.709C294.947 258.165 291.434 261.144 288.416 264.593C286.49 267.18 284.227 269.453 281.651 271.386C280.35 272.17 281.651 273.738 280.61 274.522C278.58 276.69 276.082 278.389 273.324 279.486C264.477 282.621 255.63 281.838 246.783 280.792C236.192 279.251 225.732 276.795 215.558 273.477C207.492 271.125 199.946 267.99 191.619 266.422C182.564 264.88 173.274 265.612 164.557 268.512C161.435 269.792 158.391 271.256 155.45 272.954C154.67 273.215 154.149 274.26 153.108 273.738C152.068 273.215 153.108 272.431 153.369 271.648C153.238 270.001 153.811 268.408 154.93 267.206C155.398 266.631 155.32 265.795 154.774 265.325C154.67 265.246 154.54 265.168 154.409 265.116C152.328 264.332 153.369 263.548 153.889 262.503C158.755 253.802 164.896 245.859 172.103 238.987C174.185 236.897 176.787 235.852 178.348 233.762C181.211 230.365 185.114 229.059 188.497 226.707C192.478 224.225 197.083 222.971 201.767 223.049C207.752 222.657 213.789 222.919 219.721 223.833C221.803 224.094 222.584 223.31 222.844 221.481C223 217.797 223.442 214.139 224.145 210.508C224.925 205.805 225.446 201.101 226.487 196.398L228.829 182.289V182.028C229.349 178.37 229.349 178.37 225.446 179.154C218.759 180.251 212.383 182.733 206.711 186.47C203.146 188.403 200.648 191.878 199.946 195.876C199.685 197.444 198.645 198.75 198.384 200.579C198.384 200.84 198.645 201.624 197.864 201.885C197.864 200.84 196.303 201.885 196.303 200.579C196.303 200.056 196.042 199.795 196.042 199.273C195.652 194.308 195.652 189.344 196.042 184.379C196.537 182.185 197.344 180.094 198.384 178.109C200.726 171.054 202.027 163.477 207.492 157.467C208.532 156.161 207.231 156.422 206.971 155.9C201.507 151.981 195.002 149.89 190.058 145.187C179.91 135.781 170.282 125.852 163.517 113.833C158.026 105.002 155.398 94.7075 155.971 84.3085C156.153 80.9119 156.049 77.5152 155.71 74.1185C155.45 68.3703 158.052 63.406 159.353 57.9191C160.134 54.7837 162.216 52.1709 162.736 49.2968C163.256 46.4227 165.859 44.3324 166.379 41.197C166.639 40.1519 168.461 39.3681 168.721 38.3229C171.843 29.9619 179.91 26.5652 186.155 21.3396C198.905 10.6271 214.257 5.14014 230.13 1.74347C233.512 0.959628 236.895 1.74347 240.017 0.175783C241.058 -0.346781 242.359 0.437065 243.66 0.698346C245.43 1.24704 247.277 1.42994 249.125 1.22091C253.054 0.201911 257.217 0.672218 260.834 2.52732C260.053 3.31116 260.314 3.04988 260.834 3.04988ZM200.726 92.6695C200.466 92.147 200.206 92.147 200.206 91.8857C200.206 91.6244 199.946 91.1018 199.946 90.8406C200.726 86.6601 201.247 81.957 204.369 78.8216C208.793 74.1185 213.216 69.938 217.64 65.235C227.267 55.045 239.497 51.1257 253.028 51.1257C254.589 51.1257 255.109 50.8645 255.63 49.2968C257.191 44.3324 257.972 39.3681 259.533 34.4037C259.793 33.6199 259.793 33.0973 259.013 32.836C255.135 31.1115 250.998 30.0664 246.783 29.7006C242.75 29.779 238.768 30.6674 235.074 32.3134C221.283 36.2327 208.845 43.9144 199.165 54.5224C191.697 63.2753 185.973 73.3869 182.252 84.3085C180.794 87.862 180.066 91.7028 180.17 95.5436C180.17 96.0662 179.649 96.8501 180.69 97.1113C181.731 97.3726 181.991 97.6339 181.211 98.4177C180.43 99.2016 180.951 99.9854 180.951 100.508C180.69 105.995 182.772 110.698 184.073 115.662C187.976 128.726 194.221 140.223 206.451 147.8C207.231 148.323 209.573 148.323 208.012 150.413C207.752 150.935 212.436 153.287 213.476 152.764C219.747 149.916 226.409 148.061 233.252 147.277C234.813 147.016 235.594 145.971 235.334 144.665C235.178 142.548 235.438 140.406 236.114 138.394C237.155 133.952 238.977 129.51 239.757 125.068C242.099 114.356 244.181 103.643 246.262 92.9308C247.043 89.2729 248.084 85.6149 248.864 81.6957C249.125 80.6506 249.385 79.6055 247.824 79.3442C237.676 75.8952 226.669 75.9998 216.599 79.6055C213.997 80.6506 210.614 81.4344 209.053 83.786C206.971 86.9213 202.808 88.489 200.726 92.6695ZM279.048 68.8929C272.283 94.4985 267.339 120.365 262.916 146.494C268.9 120.627 273.584 94.7598 279.048 68.8929ZM210.094 25.7814C216.521 22.5415 223.338 20.1638 230.39 18.7268C226.383 18.5178 222.375 19.2232 218.681 20.817C218.16 21.0783 217.379 21.3396 216.859 20.5558C216.599 20.2945 217.9 19.5106 216.599 19.7719C216.078 19.7719 215.038 20.0332 215.038 20.817C214.777 23.1686 213.997 23.1686 212.175 21.8622C211.135 21.0783 210.614 22.1235 209.833 22.3847C209.053 22.646 209.313 23.1686 209.833 23.6911C211.395 24.2137 209.573 24.7363 210.094 25.7814ZM317.819 125.068C317.767 118.38 316.909 111.691 315.217 105.211C315.477 111.9 316.336 118.536 317.819 125.068ZM357.891 237.42C358.021 239.066 358.021 240.738 357.891 242.384C357.631 244.213 359.192 246.303 359.973 248.132C360.233 248.655 360.493 249.7 361.274 249.439C362.054 249.177 361.794 248.132 361.534 247.348C360.493 244.213 359.192 240.816 357.891 237.42ZM232.211 18.2042C236.218 18.3871 240.252 18.0475 244.181 17.1591C240.278 16.8978 236.114 15.8527 232.211 18.2042ZM200.726 30.2232C202.86 29.3871 204.785 28.1329 206.451 26.5652C205.93 26.8265 205.15 26.8265 204.369 27.0878C204.916 25.9382 205.618 24.893 206.451 23.9524C204.629 24.7363 203.068 25.5201 201.507 26.304C201.247 26.5652 200.986 26.8265 200.986 27.0878C200.986 27.3491 201.507 27.6104 202.027 27.6104C202.548 27.6104 202.808 26.8265 203.328 27.6104C202.808 28.6555 201.507 28.9168 200.726 30.2232ZM348.263 259.367C347.639 256.154 346.494 253.07 344.881 250.222C345.141 253.619 345.401 257.016 348.263 259.367ZM322.503 75.1637C322.503 78.299 322.763 81.4344 322.763 84.8311C322.503 81.6957 325.105 78.299 322.503 75.1637ZM322.243 19.7719C324.324 18.2042 326.146 16.6365 328.228 15.0688C325.521 15.4346 323.232 17.2375 322.243 19.7719ZM272.543 39.3681C271.763 37.8004 270.201 38.0616 269.421 37.2778C269.421 37.2778 268.9 37.2778 268.9 37.5391V38.5842C269.941 38.8455 270.982 39.8906 272.543 39.3681ZM353.988 166.612C353.78 166.926 353.702 167.292 353.728 167.657L359.973 192.74C358.49 183.909 356.512 175.182 353.988 166.612ZM301.426 118.275C300.385 111.743 299.605 105.734 298.824 99.7242C298.694 105.995 299.579 112.266 301.426 118.275ZM325.625 240.816C324.585 235.591 323.023 230.365 321.722 225.139C322.373 230.496 323.674 235.774 325.625 240.816ZM304.028 143.097L301.686 128.204C301.582 133.273 302.363 138.315 304.028 143.097ZM307.151 157.467C306.63 154.593 305.85 151.458 305.069 148.584C305.121 151.667 305.824 154.698 307.151 157.467Z" fill="url(#wl_paint0)"/>
+        <defs>
+          <linearGradient id="wl_paint0" x1="152.301" y1="141.599" x2="400.289" y2="141.599" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#FF15CB"/>
+            <stop offset="0.11" stop-color="#FE5088"/>
+            <stop offset="0.22" stop-color="#FE834E"/>
+            <stop offset="0.31" stop-color="#FDA824"/>
+            <stop offset="0.38" stop-color="#FDBF0B"/>
+            <stop offset="0.43" stop-color="#FDC701"/>
+            <stop offset="0.46" stop-color="#FDC800"/>
+            <stop offset="0.7" stop-color="#3FFFEC"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <svg class="rings" viewBox="0 0 496 275" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g filter="url(#wl_f0)"><path d="M388.224 41C425.103 41.0001 455 70.8969 455 107.776C455 144.656 425.103 174.553 388.224 174.553L387.437 174.548C387.42 174.548 387.403 174.547 387.387 174.547C387.334 174.546 387.282 174.545 387.229 174.544C387.001 174.541 386.772 174.537 386.544 174.531C386.48 174.53 386.416 174.528 386.353 174.526C386.129 174.52 385.905 174.513 385.682 174.505C385.644 174.503 385.607 174.501 385.569 174.5C385.322 174.49 385.074 174.479 384.827 174.467C384.796 174.465 384.765 174.464 384.733 174.462C384.54 174.452 384.348 174.441 384.155 174.43C380.378 207.726 352.116 233.598 317.81 233.598C283.52 233.598 255.266 207.752 251.467 174.479C250.425 174.527 249.378 174.553 248.324 174.553L248.323 174.552V174.553C248.309 174.553 248.295 174.552 248.28 174.552C247.475 174.551 246.673 174.537 245.874 174.508C245.846 174.507 245.818 174.506 245.79 174.505C245.349 174.488 244.909 174.466 244.471 174.441C244.329 174.433 244.188 174.426 244.047 174.417C240.34 207.787 212.044 233.738 177.685 233.738C143.34 233.738 115.051 207.809 111.325 174.459C110.15 174.521 108.967 174.553 107.776 174.553C70.8969 174.553 41 144.656 41 107.776C41 70.8969 70.8969 41 107.776 41C142.121 41.0001 170.408 66.9285 174.135 100.278C175.31 100.217 176.494 100.186 177.685 100.186C179.12 100.186 180.546 100.23 181.959 100.319C185.667 66.9496 213.965 41 248.324 41C282.613 41.0003 310.867 66.845 314.666 100.117C315.708 100.069 316.756 100.045 317.81 100.045C319.175 100.045 320.531 100.086 321.876 100.167C325.653 66.8707 353.917 41.0001 388.224 41ZM177.685 114.186C176.526 114.186 175.376 114.222 174.236 114.296C171.528 142.247 151.588 165.154 125.171 172.263C127.83 198.921 150.326 219.738 177.685 219.738C205.109 219.738 227.648 198.819 230.216 172.067C204.17 164.746 184.571 142.024 181.867 114.349C180.487 114.24 179.092 114.186 177.685 114.186ZM317.81 114.045C316.8 114.045 315.797 114.073 314.801 114.129C312.143 142.293 291.993 165.364 265.33 172.365C265.413 173.152 265.512 173.941 265.631 174.73L265.622 174.731C269.439 200.126 291.351 219.598 317.81 219.598C345.166 219.598 367.659 198.782 370.32 172.126C369.976 172.03 369.634 171.931 369.292 171.83C343.608 164.251 324.368 141.644 321.752 114.189C320.45 114.093 319.136 114.045 317.81 114.045ZM107.776 55C78.6288 55 55 78.6288 55 107.776C55 136.924 78.6289 160.553 107.776 160.553C108.934 160.553 110.083 160.514 111.223 160.44C113.931 132.492 133.869 109.585 160.283 102.475C160.149 101.141 159.967 99.8198 159.733 98.5137L159.741 98.5117C155.362 73.7821 133.763 55 107.776 55ZM248.324 55C220.899 55 198.36 75.9184 195.792 102.67C221.838 109.991 241.435 132.713 244.14 160.388C244.518 160.417 244.897 160.443 245.277 160.465C245.574 160.482 245.871 160.496 246.169 160.508C246.576 160.524 246.984 160.536 247.394 160.543C247.688 160.548 247.983 160.552 248.278 160.552C248.293 160.552 248.309 160.553 248.324 160.553C249.331 160.553 250.332 160.522 251.325 160.467C251.487 158.737 251.715 157.023 252.008 155.329L252.019 155.331C256.494 129.523 275.785 108.796 300.812 102.228C298.039 75.6883 275.597 55.0003 248.324 55ZM388.224 55C360.866 55.0001 338.37 75.8156 335.71 102.473C361.909 109.745 381.629 132.586 384.28 160.406C385.582 160.502 386.897 160.553 388.224 160.553C417.371 160.553 441 136.924 441 107.776C441 78.6289 417.371 55.0001 388.224 55ZM300.292 117.021C282.57 123.254 269.179 138.68 265.84 157.575C283.562 151.342 296.954 135.916 300.292 117.021ZM159.688 117.333C142.302 123.639 129.171 138.822 125.771 157.404C143.159 151.098 156.289 135.916 159.688 117.333ZM336.32 117.383C339.678 135.643 352.434 150.612 369.388 157.092L369.391 157.085C369.497 157.126 369.604 157.164 369.71 157.204C366.328 138.833 353.432 123.793 336.32 117.383ZM196.466 117.625C199.804 135.308 211.962 149.874 228.194 156.577L229.365 157.043C229.424 157.066 229.483 157.087 229.542 157.109C226.111 138.942 213.37 124.064 196.466 117.625Z" fill="url(#wl_gradient)"/></g>
+        <path d="M107.776 167.553C140.79 167.553 167.553 140.79 167.553 107.776C167.553 74.7628 140.79 48 107.776 48C74.7627 48 48 74.7628 48 107.776C48 140.79 74.7627 167.553 107.776 167.553Z" stroke="#0081C8" stroke-width="14" stroke-miterlimit="10"/>
+        <path d="M388.224 167.553C421.237 167.553 448 140.79 448 107.776C448 74.7628 421.237 48 388.224 48C355.21 48 328.447 74.7628 328.447 107.776C328.447 140.79 355.21 167.553 388.224 167.553Z" stroke="#EE334E" stroke-width="14" stroke-miterlimit="10"/>
+        <path d="M317.809 226.597C350.823 226.597 377.586 199.834 377.586 166.821C377.586 133.807 350.823 107.044 317.809 107.044C284.796 107.044 258.033 133.807 258.033 166.821C258.033 199.834 284.796 226.597 317.809 226.597Z" stroke="#00A651" stroke-width="14" stroke-miterlimit="10"/>
+        <path d="M388.224 167.552C380.681 167.552 373.477 166.173 366.863 163.612" stroke="#EE334E" stroke-width="14" stroke-miterlimit="10"/>
+        <path d="M248.324 167.553C281.337 167.553 308.1 140.79 308.1 107.776C308.1 74.7628 281.337 48 248.324 48C215.31 48 188.547 74.7628 188.547 107.776C188.547 140.79 215.31 167.553 248.324 167.553Z" stroke="#151515" stroke-width="14" stroke-miterlimit="10"/>
+        <path d="M258.709 175.771C257.724 169.213 257.836 162.712 258.906 156.521" stroke="#00A651" stroke-width="14" stroke-miterlimit="10"/>
+        <path d="M177.684 226.738C210.698 226.738 237.46 199.975 237.46 166.962C237.46 133.948 210.698 107.185 177.684 107.185C144.671 107.185 117.908 133.948 117.908 166.962C117.908 199.975 144.671 226.738 177.684 226.738Z" stroke="#FCB131" stroke-width="14" stroke-miterlimit="10"/>
+        <g filter="url(#wl_f1)"><path d="M248.324 167.552C240.247 167.552 232.563 165.948 225.528 163.05" stroke="#151515" stroke-width="14" stroke-miterlimit="10" shape-rendering="crispEdges"/></g>
+        <path d="M166.624 97.2788C167.834 104.033 167.89 111.125 166.624 118.274" stroke="#0081C8" stroke-width="14" stroke-miterlimit="10"/>
+        <defs>
+          <filter id="wl_f0" x="0" y="0" width="496" height="274.738" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur stdDeviation="20.5" result="effect1_foregroundBlur"/></filter>
+          <filter id="wl_f1" x="156.861" y="90.5774" width="157.463" height="149.975" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset/><feGaussianBlur stdDeviation="33"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.25 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/></filter>
+          <linearGradient id="wl_gradient" x1="18.5" y1="178.5" x2="417" y2="74.5" gradientUnits="userSpaceOnUse"><stop offset="0.3" stop-color="#3FFFEC"/><stop offset="0.509166" stop-color="#FDC800"/><stop offset="0.569359" stop-color="#D2A500"/><stop offset="0.62" stop-color="#CA9600"/><stop offset="0.69" stop-color="#FDA824"/><stop offset="0.78" stop-color="#FE834E"/><stop offset="0.89" stop-color="#FE5088"/><stop offset="1" stop-color="#FF15CB"/></linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <h1 class="onboarding-h1">LA28 Olympics Experience</h1>
+    <p class="onboarding-subtitle">Your personalized platform for navigating the Games. Plan your journey, track your events, and explore Los Angeles.</p>
+    <div class="language-selector">
+      <button class="lang-option selected" onclick="selectLanguage('en')">English</button>
+      <button class="lang-option" onclick="selectLanguage('es')">Español</button>
+      <button class="lang-option" onclick="selectLanguage('fr')">Français</button>
+    </div>
+    <button class="btn-primary" onclick="nextOnboardingScreen()">Continue</button>
+  </div>
+
+  <div class="onboarding-screen" id="screen-role">
+    <h1 class="onboarding-h1">Select Your Role</h1>
+    <p class="onboarding-subtitle">Customize your experience based on how you'll participate in LA28.</p>
+    <div class="role-grid">
+      <div class="role-card" onclick="selectRole('spectator')">
+        <div class="role-icon">🎫</div>
+        <div class="role-name">Spectator</div>
+        <div class="role-desc">Browse events, plan your itinerary, and experience the Games</div>
+      </div>
+      <div class="role-card" onclick="selectRole('athlete')">
+        <div class="role-icon">🏅</div>
+        <div class="role-name">Athlete</div>
+        <div class="role-desc">Access training facilities, competition schedules, and athlete services</div>
+      </div>
+      <div class="role-card" onclick="selectRole('volunteer')">
+        <div class="role-icon">👋</div>
+        <div class="role-name">Volunteer</div>
+        <div class="role-desc">View shift schedules, check assignments, and coordinate with team</div>
+      </div>
+      <div class="role-card" onclick="selectRole('press')">
+        <div class="role-icon">📷</div>
+        <div class="role-name">Press</div>
+        <div class="role-desc">Access press centers, filing facilities, and media resources</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="app-container" id="app" style="display:none;">
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <svg width="80" viewBox="0 0 496 275" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g filter="url(#sb_filter0)">
+          <path d="M388.224 41C425.103 41.0001 455 70.8969 455 107.776C455 144.656 425.103 174.553 388.224 174.553L387.437 174.548C387.42 174.548 387.403 174.547 387.387 174.547C387.334 174.546 387.282 174.545 387.229 174.544C387.001 174.541 386.772 174.537 386.544 174.531C386.48 174.53 386.416 174.528 386.353 174.526C386.129 174.52 385.905 174.513 385.682 174.505C385.644 174.503 385.607 174.501 385.569 174.5C385.322 174.49 385.074 174.479 384.827 174.467C384.796 174.465 384.765 174.464 384.733 174.462C384.54 174.452 384.348 174.441 384.155 174.43C380.378 207.726 352.116 233.598 317.81 233.598C283.52 233.598 255.266 207.752 251.467 174.479C250.425 174.527 249.378 174.553 248.324 174.553L248.323 174.552V174.553C248.309 174.553 248.295 174.552 248.28 174.552C247.475 174.551 246.673 174.537 245.874 174.508C245.846 174.507 245.818 174.506 245.79 174.505C245.349 174.488 244.909 174.466 244.471 174.441C244.329 174.433 244.188 174.426 244.047 174.417C240.34 207.787 212.044 233.738 177.685 233.738C143.34 233.738 115.051 207.809 111.325 174.459C110.15 174.521 108.967 174.553 107.776 174.553C70.8969 174.553 41 144.656 41 107.776C41 70.8969 70.8969 41 107.776 41C142.121 41.0001 170.408 66.9285 174.135 100.278C175.31 100.217 176.494 100.186 177.685 100.186C179.12 100.186 180.546 100.23 181.959 100.319C185.667 66.9496 213.965 41 248.324 41C282.613 41.0003 310.867 66.845 314.666 100.117C315.708 100.069 316.756 100.045 317.81 100.045C319.175 100.045 320.531 100.086 321.876 100.167C325.653 66.8707 353.917 41.0001 388.224 41ZM177.685 114.186C176.526 114.186 175.376 114.222 174.236 114.296C171.528 142.247 151.588 165.154 125.171 172.263C127.83 198.921 150.326 219.738 177.685 219.738C205.109 219.738 227.648 198.819 230.216 172.067C204.17 164.746 184.571 142.024 181.867 114.349C180.487 114.24 179.092 114.186 177.685 114.186ZM317.81 114.045C316.8 114.045 315.797 114.073 314.801 114.129C312.143 142.293 291.993 165.364 265.33 172.365C265.413 173.152 265.512 173.941 265.631 174.73L265.622 174.731C269.439 200.126 291.351 219.598 317.81 219.598C345.166 219.598 367.659 198.782 370.32 172.126C369.976 172.03 369.634 171.931 369.292 171.83C343.608 164.251 324.368 141.644 321.752 114.189C320.45 114.093 319.136 114.045 317.81 114.045ZM107.776 55C78.6288 55 55 78.6288 55 107.776C55 136.924 78.6289 160.553 107.776 160.553C108.934 160.553 110.083 160.514 111.223 160.44C113.931 132.492 133.869 109.585 160.283 102.475C160.149 101.141 159.967 99.8198 159.733 98.5137L159.741 98.5117C155.362 73.7821 133.763 55 107.776 55ZM248.324 55C220.899 55 198.36 75.9184 195.792 102.67C221.838 109.991 241.435 132.713 244.14 160.388C244.518 160.417 244.897 160.443 245.277 160.465C245.574 160.482 245.871 160.496 246.169 160.508C246.576 160.524 246.984 160.536 247.394 160.543C247.688 160.548 247.983 160.552 248.278 160.552C248.293 160.552 248.309 160.553 248.324 160.553C249.331 160.553 250.332 160.522 251.325 160.467C251.487 158.737 251.715 157.023 252.008 155.329L252.019 155.331C256.494 129.523 275.785 108.796 300.812 102.228C298.039 75.6883 275.597 55.0003 248.324 55ZM388.224 55C360.866 55.0001 338.37 75.8156 335.71 102.473C361.909 109.745 381.629 132.586 384.28 160.406C385.582 160.502 386.897 160.553 388.224 160.553C417.371 160.553 441 136.924 441 107.776C441 78.6289 417.371 55.0001 388.224 55ZM300.292 117.021C282.57 123.254 269.179 138.68 265.84 157.575C283.562 151.342 296.954 135.916 300.292 117.021ZM159.688 117.333C142.302 123.639 129.171 138.822 125.771 157.404C143.159 151.098 156.289 135.916 159.688 117.333ZM336.32 117.383C339.678 135.643 352.434 150.612 369.388 157.092L369.391 157.085C369.497 157.126 369.604 157.164 369.71 157.204C366.328 138.833 353.432 123.793 336.32 117.383ZM196.466 117.625C199.804 135.308 211.962 149.874 228.194 156.577L229.365 157.043C229.424 157.066 229.483 157.087 229.542 157.109C226.111 138.942 213.37 124.064 196.466 117.625Z" fill="url(#sb_gradient)"/>
+        </g>
+        <path d="M107.776 167.553C140.79 167.553 167.553 140.79 167.553 107.776C167.553 74.7628 140.79 48 107.776 48C74.7627 48 48 74.7628 48 107.776C48 140.79 74.7627 167.553 107.776 167.553Z" stroke="#0081C8" stroke-width="14" stroke-miterlimit="10"/>
+        <path d="M388.224 167.553C421.237 167.553 448 140.79 448 107.776C448 74.7628 421.237 48 388.224 48C355.21 48 328.447 74.7628 328.447 107.776C328.447 140.79 355.21 167.553 388.224 167.553Z" stroke="#EE334E" stroke-width="14" stroke-miterlimit="10"/>
+        <path d="M317.809 226.597C350.823 226.597 377.586 199.834 377.586 166.821C377.586 133.807 350.823 107.044 317.809 107.044C284.796 107.044 258.033 133.807 258.033 166.821C258.033 199.834 284.796 226.597 317.809 226.597Z" stroke="#00A651" stroke-width="14" stroke-miterlimit="10"/>
+        <path d="M388.224 167.552C380.681 167.552 373.477 166.173 366.863 163.612" stroke="#EE334E" stroke-width="14" stroke-miterlimit="10"/>
+        <path d="M248.324 167.553C281.337 167.553 308.1 140.79 308.1 107.776C308.1 74.7628 281.337 48 248.324 48C215.31 48 188.547 74.7628 188.547 107.776C188.547 140.79 215.31 167.553 248.324 167.553Z" stroke="#151515" stroke-width="14" stroke-miterlimit="10"/>
+        <path d="M258.709 175.771C257.724 169.213 257.836 162.712 258.906 156.521" stroke="#00A651" stroke-width="14" stroke-miterlimit="10"/>
+        <path d="M177.684 226.738C210.698 226.738 237.46 199.975 237.46 166.962C237.46 133.948 210.698 107.185 177.684 107.185C144.671 107.185 117.908 133.948 117.908 166.962C117.908 199.975 144.671 226.738 177.684 226.738Z" stroke="#FCB131" stroke-width="14" stroke-miterlimit="10"/>
+        <g filter="url(#sb_filter1)">
+          <path d="M248.324 167.552C240.247 167.552 232.563 165.948 225.528 163.05" stroke="#151515" stroke-width="14" stroke-miterlimit="10" shape-rendering="crispEdges"/>
+        </g>
+        <path d="M166.624 97.2788C167.834 104.033 167.89 111.125 166.624 118.274" stroke="#0081C8" stroke-width="14" stroke-miterlimit="10"/>
+        <defs>
+          <filter id="sb_filter0" x="0" y="0" width="496" height="274.738" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+            <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+            <feGaussianBlur stdDeviation="20.5" result="effect1_foregroundBlur"/>
+          </filter>
+          <filter id="sb_filter1" x="156.861" y="90.5774" width="157.463" height="149.975" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+            <feOffset/>
+            <feGaussianBlur stdDeviation="33"/>
+            <feComposite in2="hardAlpha" operator="out"/>
+            <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.25 0"/>
+            <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+            <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+          </filter>
+          <linearGradient id="sb_gradient" x1="18.5" y1="178.5" x2="417" y2="74.5" gradientUnits="userSpaceOnUse">
+            <stop offset="0.3" stop-color="#3FFFEC"/>
+            <stop offset="0.509166" stop-color="#FDC800"/>
+            <stop offset="0.569359" stop-color="#D2A500"/>
+            <stop offset="0.62" stop-color="#CA9600"/>
+            <stop offset="0.69" stop-color="#FDA824"/>
+            <stop offset="0.78" stop-color="#FE834E"/>
+            <stop offset="0.89" stop-color="#FE5088"/>
+            <stop offset="1" stop-color="#FF15CB"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+
+    <div class="sidebar-nav" id="navMenu">
+      <div class="nav-item active" onclick="switchView('today', this)" data-view="today">
+        <span class="nav-icon">📅</span>
+        <span>Today</span>
+      </div>
+      <div class="nav-item" onclick="switchView('trip-planner', this)" data-view="trip-planner">
+        <span class="nav-icon">✈️</span>
+        <span>Trip Planner</span>
+      </div>
+      <div class="nav-item" onclick="switchView('schedule', this)" data-view="schedule">
+        <span class="nav-icon">📋</span>
+        <span>Schedule</span>
+      </div>
+      <div class="nav-item" onclick="switchView('transit', this)" data-view="transit">
+        <span class="nav-icon">🚇</span>
+        <span>Transit Map</span>
+      </div>
+      <div class="nav-item" onclick="switchView('explore', this)" data-view="explore">
+        <span class="nav-icon">🗺️</span>
+        <span>Explore LA</span>
+      </div>
+      <div class="nav-item" onclick="switchView('group', this)" data-view="group">
+        <span class="nav-icon">👥</span>
+        <span>Group</span>
+      </div>
+    </div>
+
+    <div class="sidebar-hub" id="hubSection">
+      <div class="hub-title">Role Hub</div>
+      <div class="hub-label" id="hubLabel">Spectator Hub</div>
+    </div>
+
+    <div class="sidebar-footer">
+      <button class="credential-btn" onclick="showCredential()">View Digital Credential</button>
+    </div>
+  </div>
+
+  <div class="content-area">
+    <!-- TODAY VIEW -->
+    <div class="content-view active" id="view-today">
+      <div class="content-pad">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px;">
+          <div>
+            <div class="text-secondary" style="margin-bottom: 4px;">July 18, 2028 — Day 5</div>
+            <div class="title-large">Good afternoon, Ben</div>
+          </div>
+          <div class="weather-strip">
+            <span style="font-size: 18px;">☀️</span>
+            <div class="weather-temp">82°F · Sunny</div>
+            <span class="text-tertiary">UV High · Sunset 7:48 PM</span>
+          </div>
+        </div>
+
+        <div id="alertsContainer" style="display: grid; gap: 12px; margin-bottom: 32px;"></div>
+
+        <div class="grid-2" style="margin-bottom: 20px;">
+          <div>
+            <span class="label">Your Events Today</span>
+            <div class="space-y-16" id="eventsContainer"></div>
+          </div>
+          <div>
+            <div class="card">
+              <span class="label" style="margin-bottom: 16px;">Time Available</span>
+              <div style="font-size: 28px; font-weight: 700; color: #FFB74D; margin-bottom: 16px;">3h 45m</div>
+              <p class="text-secondary">Before your 7:30 PM departure to the Coliseum. Perfect time to explore the area or grab dinner.</p>
+            </div>
+            <span class="label" style="margin-top: 20px; margin-bottom: 12px;">Recommended</span>
+            <div id="recommendedContainer" class="space-y-12"></div>
+          </div>
+        </div>
+
+        <span class="label" style="margin-bottom: 16px;">Coming Up</span>
+        <div class="space-y-16" id="comingUpContainer"></div>
+      </div>
+    </div>
+
+    <!-- TRIP PLANNER VIEW -->
+    <div class="content-view" id="view-trip-planner">
+      <div class="content-pad">
+        <h2 class="title-large">Trip Planner</h2>
+        <p class="text-secondary" style="margin-bottom: 32px;">Build your itinerary by adding events from the Schedule or Today views.</p>
+
+        <div class="grid-2" style="gap: 40px;">
+          <div>
+            <span class="label" style="margin-bottom: 16px;">My Itinerary</span>
+            <div id="myItinerary" class="space-y-12"></div>
+          </div>
+          <div>
+            <span class="label" style="margin-bottom: 16px;">Browse by Day</span>
+            <div class="calendar-grid" id="tripCalendar" style="margin-bottom: 20px;"></div>
+            <div id="tripDayView" style="display:none;">
+              <h3 class="title-medium" style="margin-bottom: 16px;" id="tripDayTitle">Selected Day Events</h3>
+              <div class="space-y-12" id="tripDayEvents"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCHEDULE VIEW -->
+    <div class="content-view" id="view-schedule">
+      <div class="content-pad">
+        <h2 class="title-large">Schedule</h2>
+        <p class="text-secondary" style="margin-bottom: 32px;">Start by browsing the Schedule to find events that interest you</p>
+
+        <div class="grid-2" style="gap: 40px; margin-bottom: 40px;">
+          <div>
+            <span class="label" style="margin-bottom: 16px;">Select Date</span>
+            <div class="calendar-grid" id="scheduleCalendar" style="grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 32px;"></div>
+
+            <div>
+              <span class="label" style="margin-bottom: 16px;">Filter by Sport</span>
+              <div class="filter-pills" id="sportFilter"></div>
+            </div>
+          </div>
+
+          <div id="scheduleEvents" class="space-y-12"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRANSIT MAP VIEW -->
+    <div class="content-view" id="view-transit">
+      <div id="map"></div>
+      <div class="map-controls">
+        <button class="map-control-toggle active" onclick="toggleMapLayer('lines')">Metro Lines</button>
+        <button class="map-control-toggle active" onclick="toggleMapLayer('stations')">Stations</button>
+        <button class="map-control-toggle active" onclick="toggleMapLayer('venues')">Venues</button>
+        <button class="map-control-toggle" onclick="toggleMapLayer('pois')">Food & Activities</button>
+      </div>
+      <div class="venue-detail" id="venueDetail" style="display:none;">
+        <h3 id="venueName"></h3>
+        <p id="venueSport"></p>
+        <p id="venueCrowd"></p>
+      </div>
+    </div>
+
+    <!-- EXPLORE LA VIEW -->
+    <div class="content-view" id="view-explore">
+      <div class="content-pad">
+        <div id="exploreList">
+          <h2 class="title-large">Explore LA</h2>
+          <p class="text-secondary" style="margin-bottom: 24px;">Discover neighborhoods, cultural landmarks, and local experiences around the Olympics.</p>
+          <div class="filter-pills" id="exploreFilter" style="margin-bottom: 24px;"></div>
+          <div class="grid-3" id="exploreCards"></div>
+        </div>
+        <div id="exploreDetail" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- GROUP VIEW -->
+    <div class="content-view" id="view-group">
+      <div class="content-pad">
+        <h2 class="title-large">Group</h2>
+        <p class="text-secondary" style="margin-bottom: 32px;">Coordinate with your group and share your LA28 experience.</p>
+
+        <div class="grid-2" style="gap: 40px;">
+          <div>
+            <span class="label" style="margin-bottom: 16px;">Members</span>
+            <div id="groupMembers" class="space-y-12" style="margin-bottom: 32px;"></div>
+            <button class="btn-primary" style="width:100%;padding:12px;border-radius:10px;background:var(--surface);border:1px dashed var(--border);color:var(--text-secondary);cursor:pointer;font-size:13px;" onclick="showToast('Invite link copied!')">+ Invite someone</button>
+          </div>
+          <div>
+            <span class="label" style="margin-bottom: 16px;">Shared Events</span>
+            <div id="sharedEvents" class="space-y-12"></div>
+
+            <span class="label" style="margin-top: 32px; margin-bottom: 16px;">Group Chat</span>
+            <div id="groupChat" class="card" style="max-height: 320px; overflow-y: auto;"></div>
+            <div style="display:flex;gap:8px;margin-top:8px;">
+              <input type="text" id="chatInput" placeholder="Message your group..." style="flex:1;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;" onkeydown="if(event.key==='Enter')sendGroupChat()">
+              <button onclick="sendGroupChat()" style="padding:10px 16px;border-radius:10px;background:var(--accent);color:#fff;border:none;cursor:pointer;font-weight:600;font-size:13px;">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EVENT DETAIL MODAL -->
+<div class="modal-overlay" id="eventDetailModal" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-card" id="eventDetailContent" style="max-width:480px;"></div>
+</div>
+
+<!-- CREDENTIAL MODAL -->
+<div class="modal-overlay" id="credentialModal" onclick="if(event.target === this) closeCredential()">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-label" id="credRole">Spectator</div>
+      <div class="modal-title">Benjamin Kase</div>
+      <div style="display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 4px 14px; border-radius: 999px; background: rgba(255, 107, 43, 0.15); color: var(--accent); font-size: 13px; font-weight: 600;" id="credRoleTag">Spectator</div>
+    </div>
+
+    <div class="qr-container">
+      <svg width="140" height="140" viewBox="0 0 140 140" id="qrCode"></svg>
+    </div>
+
+    <div class="access-zones">
+      <span class="label" style="margin-bottom: 12px;">Access Zones</span>
+      <div class="zones-list" id="zonesList"></div>
+    </div>
+
+    <div id="mealVoucher" style="display:none;">
+      <div class="meal-balance">
+        <div>
+          <div style="font-size: 11px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em;">Meal Voucher Balance</div>
+          <div class="meal-amount">$124.50</div>
+        </div>
+        <div style="font-size: 12px; color: var(--text-secondary);">12 meals remaining</div>
+      </div>
+    </div>
+
+    <div class="olympic-stripe">
+      <div class="stripe-bar" style="background: #0081C8;"></div>
+      <div class="stripe-bar" style="background: #EE334E;"></div>
+      <div class="stripe-bar" style="background: #00A651;"></div>
+      <div class="stripe-bar" style="background: #2D2D2D;"></div>
+      <div class="stripe-bar" style="background: #FCB131;"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.js"></script>
+
+<script>
+// ============================================================
+// LA28 DESKTOP EXPERIENCE - VANILLA JS
+// ============================================================
+
+// STATE
+const STATE = {
+  currentView: 'today',
+  role: 'spectator',
+  language: 'en',
+  expandedCard: null,
+  selectedScheduleDay: 0,
+  sportFilter: 'All',
+  tripEvents: [],
+  selectedTripDay: null,
+  mapLayers: { lines: true, venues: true, stations: true, pois: false },
+  selectedVenue: null,
+  map: null,
+  mapMarkers: [],
+};
+
+// DATA
+const METROS_LINES = [
+  { id: 'A', name: 'A Line', color: '#0072BC', route: 'Long Beach ↔ DTLA' },
+  { id: 'B', name: 'B Line', color: '#E3242B', route: 'North Hollywood ↔ Union Station' },
+  { id: 'C', name: 'C Line', color: '#00A651', route: 'Norwalk ↔ Redondo Beach' },
+  { id: 'D', name: 'D Line', color: '#A05EB5', route: 'Koreatown ↔ Westwood/UCLA' },
+  { id: 'E', name: 'E Line', color: '#FDB913', route: 'East LA ↔ Santa Monica' },
+  { id: 'K', name: 'K Line', color: '#D29AD6', route: 'Expo/Crenshaw ↔ LAX' },
+  { id: 'G', name: 'G Line', color: '#F58220', route: 'Chatsworth ↔ North Hollywood' },
+  { id: 'J', name: 'J Line', color: '#9B9EA3', route: 'El Monte ↔ San Pedro' },
+];
+
+const VENUES = [
+  { id: 'v1', name: 'SoFi Stadium', sport: 'Ceremonies / Soccer', area: 'Inglewood', crowd: 'extreme', lat: 33.9535, lng: -118.3392, capacity: '70,000' },
+  { id: 'v2', name: 'LA Memorial Coliseum', sport: 'Track & Field', area: 'Expo Park', crowd: 'high', lat: 34.0141, lng: -118.2879, capacity: '78,000' },
+  { id: 'v3', name: 'Crypto.com Arena', sport: 'Basketball / Gymnastics', area: 'DTLA', crowd: 'high', lat: 34.0430, lng: -118.2673, capacity: '20,000' },
+  { id: 'v4', name: 'Aquatics Center', sport: 'Swimming / Diving', area: 'Expo Park', crowd: 'moderate', lat: 34.0155, lng: -118.2860, capacity: '15,000' },
+  { id: 'v5', name: 'Pauley Pavilion', sport: 'Judo / Wrestling', area: 'Westwood', crowd: 'moderate', lat: 34.0703, lng: -118.4468, capacity: '13,000' },
+  { id: 'v6', name: 'UCLA Athlete Village', sport: 'Athlete Housing', area: 'Westwood', crowd: 'low', lat: 34.0689, lng: -118.4452, capacity: 'N/A' },
+  { id: 'v7', name: 'Long Beach Conv. Center', sport: 'Boxing / Fencing', area: 'Long Beach', crowd: 'moderate', lat: 33.7655, lng: -118.1897, capacity: '12,000' },
+  { id: 'v8', name: 'Dedeaux Field', sport: 'Baseball / Softball', area: 'USC', crowd: 'low', lat: 34.0243, lng: -118.2870, capacity: '10,000' },
+  { id: 'v9', name: 'Sepulveda Basin', sport: 'Archery', area: 'Van Nuys', crowd: 'low', lat: 34.1725, lng: -118.4747, capacity: '7,500' },
+  { id: 'v10', name: 'Riviera Country Club', sport: 'Golf', area: 'Pacific Palisades', crowd: 'moderate', lat: 34.0491, lng: -118.5085, capacity: '25,000' },
+  { id: 'v11', name: 'Dignity Health Sports Park', sport: 'Tennis / Cycling', area: 'Carson', crowd: 'moderate', lat: 33.8644, lng: -118.2611, capacity: '27,000' },
+  { id: 'v12', name: 'Galen Center', sport: 'Badminton', area: 'USC', crowd: 'low', lat: 34.0241, lng: -118.2835, capacity: '10,258' },
+];
+
+const EXPLORE_ITEMS = [
+  { id: 'x1', title: 'Street Art of DTLA', type: 'Walking Tour', duration: '2 hrs', distance: '1.8 mi', description: 'From murals in the Arts District to hidden gems on Spring St. The creative heartbeat of Los Angeles.', neighborhood: 'DTLA' },
+  { id: 'x2', title: 'Venice Beach & Boardwalk', type: 'Neighborhood', duration: 'Half day', distance: 'E Line accessible', description: 'Skate parks, Muscle Beach, street performers, and ocean views. Where LA meets the Pacific.', neighborhood: 'Coastal' },
+  { id: 'x3', title: 'Grand Central Market', type: 'Food & Culture', duration: '1-2 hrs', distance: 'Near Civic Center', description: 'LA\'s legendary food hall — 40+ vendors from ramen to pupusas. A celebration of LA\'s food culture.', neighborhood: 'DTLA' },
+  { id: 'x4', title: 'The Getty Center', type: 'Art & Culture', duration: '3-4 hrs', distance: 'Shuttle from Expo', description: 'World-class art collection with panoramic city views. Inspiring perspectives above the city.', neighborhood: 'Westwood' },
+  { id: 'x5', title: 'Little Tokyo', type: 'Neighborhood', duration: '2-3 hrs', distance: 'Walking from DTLA', description: 'Historic Japanese-American neighborhood. Ramen, mochi, JANM museum. A cultural gem.', neighborhood: 'DTLA' },
+  { id: 'x6', title: 'Griffith Observatory', type: 'Landmark', duration: '2-3 hrs', distance: 'Bus from B Line', description: 'Iconic views of Hollywood sign, downtown, and the Pacific. LA\'s skyline under the stars.', neighborhood: 'Hollywood' },
+  { id: 'x7', title: 'Leimert Park', type: 'Neighborhood', duration: '2-3 hrs', distance: 'Walking tour available', description: 'Historic African-American community center. Jazz clubs, art galleries, street art, and cultural hub.', neighborhood: 'Leimert Park' },
+  { id: 'x8', title: 'Boyle Heights', type: 'Neighborhood', duration: '2-3 hrs', distance: 'B & L Lines', description: 'Hip neighborhood with vibrant street art, vintage shops, and authentic Mexican cuisine.', neighborhood: 'Boyle Heights' },
+  { id: 'x9', title: 'Koreatown', type: 'Neighborhood', duration: '2-3 hrs', distance: 'D Line accessible', description: 'Bustling Korean enclave with BBQ, karaoke, spas, and late-night dining culture.', neighborhood: 'Koreatown' },
+  { id: 'x10', title: 'Little Ethiopia', type: 'Neighborhood', duration: '1-2 hrs', distance: 'Walking from DTLA', description: 'Authentic Ethiopian restaurants, coffee ceremonies, and vibrant cultural atmosphere.', neighborhood: 'Little Ethiopia' },
+];
+
+const GROUP_MEMBERS = [
+  { id: 'u1', name: 'You', email: 'ben@example.com', role: 'spectator', status: 'confirmed' },
+  { id: 'u2', name: 'Sarah Chen', email: 'sarah@example.com', role: 'spectator', status: 'confirmed' },
+  { id: 'u3', name: 'Marco Rossi', email: 'marco@example.com', role: 'spectator', status: 'pending' },
+];
+
+const MY_EVENTS = [
+  { id: 'me1', sport: 'Track & Field', round: '100m Semi-final', venue: 'LA Memorial Coliseum', venueId: 'v2', time: '19:00', date: 'Jul 18', crowd: 'extreme', route: [{ mode: 'walk', detail: 'Walk to 7th/Metro', duration: '5 min' }, { mode: 'metro', detail: 'E Line → Expo Park', duration: '28 min', line: 'E' }, { mode: 'walk', detail: 'Walk to Gate A', duration: '9 min' }] },
+  { id: 'me2', sport: 'Swimming', round: '200m Freestyle Final', venue: 'Aquatics Center', venueId: 'v4', time: '20:30', date: 'Jul 18', crowd: 'high', route: [{ mode: 'walk', detail: 'Walk from Coliseum', duration: '12 min' }] },
+  { id: 'me3', sport: 'Basketball', round: 'Group Stage — USA vs France', venue: 'Crypto.com Arena', venueId: 'v3', time: '14:00', date: 'Jul 19', crowd: 'extreme', route: [{ mode: 'walk', detail: 'Walk to station', duration: '4 min' }, { mode: 'metro', detail: 'A Line → Pico', duration: '22 min', line: 'A' }, { mode: 'walk', detail: 'Walk to arena', duration: '9 min' }] },
+  { id: 'me4', sport: 'Gymnastics', round: 'Women\'s All-Around Final', venue: 'Crypto.com Arena', venueId: 'v3', time: '18:00', date: 'Jul 21', crowd: 'high', route: [{ mode: 'walk', detail: 'Walk to station', duration: '4 min' }, { mode: 'metro', detail: 'A Line → Pico', duration: '22 min', line: 'A' }, { mode: 'walk', detail: 'Walk to arena', duration: '9 min' }] },
+];
+
+const ALERTS = [
+  { id: 'a1', type: 'advisory', title: 'E Line: Minor delays', body: '5-8 min delays eastbound due to signal maintenance. Expected clear by 5 PM.', time: '2:15 PM' },
+  { id: 'a2', type: 'info', title: 'New shuttle added', body: 'Express shuttle from Union Station to Coliseum now running every 10 min during Track & Field events.', time: '1:00 PM' },
+];
+
+const METRO_COORDS = {
+  A: [[33.7680,-118.1893],[33.8025,-118.1965],[33.8312,-118.2030],[33.8714,-118.2239],[33.9219,-118.2388],[33.9564,-118.2469],[33.9862,-118.2537],[34.0143,-118.2608],[34.0487,-118.2590]],
+  B: [[34.1683,-118.3767],[34.1415,-118.3585],[34.1061,-118.3270],[34.0983,-118.3175],[34.0628,-118.3090],[34.0530,-118.2956],[34.0487,-118.2590],[34.0561,-118.2365]],
+  C: [[33.9092,-118.1048],[33.9058,-118.1530],[33.9154,-118.2060],[33.9219,-118.2388],[33.9282,-118.2611],[33.9302,-118.2818],[33.9292,-118.3095],[33.9350,-118.3392],[33.9160,-118.3710],[33.8683,-118.3762]],
+  D: [[34.0487,-118.2590],[34.0530,-118.2956],[34.0628,-118.3090],[34.0624,-118.3352],[34.0623,-118.3649],[34.0630,-118.3950],[34.0633,-118.4268],[34.0635,-118.4454]],
+  E: [[34.0335,-118.1712],[34.0360,-118.1850],[34.0380,-118.2100],[34.0561,-118.2365],[34.0487,-118.2590],[34.0143,-118.2608],[34.0155,-118.2860],[34.0141,-118.2879],[34.0110,-118.3100],[34.0237,-118.3281],[34.0200,-118.3500],[34.0170,-118.3800],[34.0150,-118.4100],[34.0135,-118.4450],[34.0120,-118.4700],[34.0116,-118.4943]],
+  K: [[34.0237,-118.3281],[34.0100,-118.3310],[33.9950,-118.3350],[33.9800,-118.3370],[33.9650,-118.3390],[33.9535,-118.3400],[33.9344,-118.3890]],
+  G: [[34.2569,-118.6018],[34.2350,-118.5500],[34.2092,-118.4985],[34.1883,-118.4747],[34.1764,-118.4560],[34.1700,-118.4370],[34.1650,-118.4150],[34.1620,-118.3900],[34.1683,-118.3767]],
+  J: [[34.0719,-118.0324],[34.0560,-118.0830],[34.0410,-118.1340],[34.0350,-118.1700],[34.0380,-118.2100],[34.0561,-118.2365],[34.0487,-118.2590],[34.0143,-118.2608],[33.9282,-118.2611],[33.8644,-118.2611],[33.7900,-118.2611]],
+};
+
+const SCHEDULE = generateSchedule();
+
+function generateSchedule() {
+  const sports = ['Track & Field','Swimming','Basketball','Gymnastics','Soccer','Boxing','Tennis','Cycling','Diving','Judo','Fencing','Archery','Golf','Baseball','Badminton','Wrestling'];
+  const times = ['09:00','10:30','13:00','14:30','16:00','19:00','20:30'];
+  const rounds = ['Preliminary','Quarter-final','Semi-final','Final','Group Stage','Round of 16'];
+  const days = [];
+  for (let d = 14; d <= 28; d++) {
+    const events = [];
+    const count = 8 + Math.floor(Math.random() * 10);
+    for (let i = 0; i < count; i++) {
+      const sport = sports[Math.floor(Math.random() * sports.length)];
+      const venue = VENUES.find(v => v.sport.toLowerCase().includes(sport.toLowerCase())) || VENUES[Math.floor(Math.random() * 5)];
+      events.push({
+        id: `e-${d}-${i}`,
+        sport,
+        round: rounds[Math.floor(Math.random() * rounds.length)],
+        venue: venue.name,
+        venueId: venue.id,
+        time: times[Math.floor(Math.random() * times.length)],
+        date: `Jul ${d}`,
+        crowd: ['low','moderate','high','extreme'][Math.floor(Math.random() * 4)],
+        tickets: Math.random() > 0.3 ? 'Available' : 'Sold Out',
+      });
+    }
+    days.push({ date: `Jul ${d}`, day: d - 13, events: events.sort((a,b) => a.time.localeCompare(b.time)) });
+  }
+  return days;
+}
+
+// ONBOARDING
+function selectLanguage(lang) {
+  STATE.language = lang;
+  document.querySelectorAll('.lang-option').forEach(btn => btn.classList.remove('selected'));
+  event.target.classList.add('selected');
+}
+
+function nextOnboardingScreen() {
+  document.getElementById('screen-welcome').classList.remove('active');
+  document.getElementById('screen-role').classList.add('active');
+}
+
+function selectRole(role) {
+  STATE.role = role;
+  document.querySelectorAll('.role-card').forEach(card => card.classList.remove('selected'));
+  event.target.closest('.role-card').classList.add('selected');
+  setTimeout(() => {
+    document.getElementById('onboarding').classList.remove('active');
+    document.getElementById('app').style.display = 'flex';
+    initApp();
+  }, 300);
+}
+
+// APP INIT
+function initApp() {
+  updateHubSection();
+  renderToday();
+  renderTripPlanner();
+  renderSchedule();
+  renderExplore();
+  renderGroupMembers();
+  renderMyItinerary();
+  initializeMap();
+}
+
+function updateHubSection() {
+  const hubs = {
+    athlete: 'Athlete Prep',
+    spectator: 'Spectator Hub',
+    volunteer: 'Volunteer Hub',
+    press: 'Press Center',
+  };
+  document.getElementById('hubLabel').textContent = hubs[STATE.role] || 'Hub';
+}
+
+// VIEW SWITCHING
+function switchView(view, element) {
+  STATE.currentView = view;
+  document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+  element.classList.add('active');
+  document.querySelectorAll('.content-view').forEach(v => v.classList.remove('active'));
+  document.getElementById(`view-${view}`).classList.add('active');
+  if (view === 'transit') {
+    if (!STATE.map) setTimeout(() => initializeMap(), 100);
+    else setTimeout(() => STATE.map.resize(), 100);
+  }
+}
+
+// RENDER VIEWS
+function renderToday() {
+  const alerts = ALERTS.map(a => `<div class="alert-banner" id="alert-${a.id}">
+    <span style="font-size: 16px;">${a.type === 'advisory' ? '⚠️' : 'ℹ️'}</span>
+    <div style="flex: 1;">
+      <div class="alert-title">${a.title}</div>
+      <div class="alert-body">${a.body}</div>
+    </div>
+    <span class="alert-time">${a.time}</span>
+    <button onclick="dismissAlert('${a.id}', event)" style="background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:18px;padding:4px 8px;opacity:0.5;transition:opacity 0.15s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5">✕</button>
+  </div>`).join('');
+  document.getElementById('alertsContainer').innerHTML = alerts;
+
+  const todayEvents = MY_EVENTS.filter(e => e.date === 'Jul 18');
+  const eventCards = todayEvents.map(e => renderJourneyCard(e)).join('');
+  document.getElementById('eventsContainer').innerHTML = eventCards || '<p class="text-secondary">No events today</p>';
+
+  const comingUp = MY_EVENTS.filter(e => e.date !== 'Jul 18');
+  const comingUpCards = comingUp.map(e => renderJourneyCard(e)).join('');
+  document.getElementById('comingUpContainer').innerHTML = comingUpCards;
+
+  const recommended = EXPLORE_ITEMS.slice(0, 2).map(item => `<div class="card" style="cursor: pointer;" onclick="openExploreDetail('${item.id}')">
+    <div style="font-size: 11px; color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px;">${item.type}</div>
+    <div class="title-small">${item.title}</div>
+    <div class="text-tertiary" style="margin-top: 4px;">${item.duration} · ${item.distance}</div>
+  </div>`).join('');
+  document.getElementById('recommendedContainer').innerHTML = recommended;
+}
+
+function renderJourneyCard(event) {
+  return `<div class="journey-card" onclick="toggleCardExpanded('${event.id}', this)">
+    <div class="journey-header">
+      <div class="journey-top">
+        <div class="journey-sport-title">
+          <div class="journey-sport">${event.sport}</div>
+          <div class="journey-round">${event.round}</div>
+        </div>
+        <div class="journey-time">
+          <div class="journey-time-big">${event.time}</div>
+          <div class="journey-time-small">${event.date}</div>
+        </div>
+      </div>
+      <div class="journey-details">
+        <span>📍 ${event.venue}</span>
+        <span class="badge crowd-${event.crowd}">● ${getCrowdLabel(event.crowd)}</span>
+      </div>
+      <div class="journey-footer">
+        <div class="route-strip">${renderRouteStrip(event.route)}</div>
+      </div>
+    </div>
+    <div class="journey-expanded" style="display:none;">
+      <span class="route-detail-label">Route Detail — Depart by 17:45 (includes 15 min security screening)</span>
+      ${event.route.map((step, i) => `<div class="route-detail-step">
+        <div class="route-detail-icon">${step.mode === 'metro' ? `<span class="badge transit" style="background: ${getLineColor(step.line)}">${step.line}</span>` : '🚶'}</div>
+        <div class="route-detail-text">
+          <p>${step.detail}</p>
+        </div>
+        <div class="route-detail-duration">${step.duration}</div>
+      </div>`).join('')}
+      <div class="journey-actions">
+        <button class="btn-add" onclick="addToTrip('${event.id}', event)">Add to Trip</button>
+        <button class="btn-close" onclick="toggleCardExpanded('${event.id}', event.target.closest('.journey-card'))">Close</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleCardExpanded(eventId, element) {
+  const expanded = element.querySelector('.journey-expanded');
+  const allExpanded = document.querySelectorAll('.journey-expanded');
+  allExpanded.forEach(e => {
+    if (e !== expanded) e.style.display = 'none';
+  });
+  allExpanded.forEach(card => card.closest('.journey-card').classList.remove('expanded'));
+  expanded.style.display = expanded.style.display === 'none' ? 'block' : 'none';
+  element.classList.toggle('expanded');
+}
+
+function renderRouteStrip(route) {
+  return route.map((step, i) => `${i > 0 ? '<div class="route-divider"></div>' : ''}<div class="route-step">${step.mode === 'metro' ? `<span class="badge transit" style="background: ${getLineColor(step.line)}">${step.line}</span>` : '🚶'} ${step.duration}</div>`).join('');
+}
+
+function getCrowdLabel(level) {
+  return { low: 'Low crowds', moderate: 'Moderate', high: 'Busy', extreme: 'Very busy' }[level] || level;
+}
+
+function getLineColor(line) {
+  const line_obj = METROS_LINES.find(l => l.id === line);
+  return line_obj ? line_obj.color : '#999';
+}
+
+function addToTrip(eventId, evt) {
+  evt.stopPropagation();
+  const event = MY_EVENTS.find(e => e.id === eventId) || SCHEDULE.flatMap(d => d.events).find(e => e.id === eventId);
+  if (!event) return;
+  if (STATE.tripEvents.find(e => e.id === eventId)) {
+    showToast(`Already in your trip`);
+    return;
+  }
+  STATE.tripEvents.push(event);
+  showToast(`${event.sport} — ${event.round} added to trip`);
+  renderMyItinerary();
+}
+
+function removeFromTrip(eventId) {
+  STATE.tripEvents = STATE.tripEvents.filter(e => e.id !== eventId);
+  renderMyItinerary();
+  showToast('Removed from trip');
+}
+
+function showToast(msg) {
+  let toast = document.getElementById('toast');
+  if (!toast) { toast = document.createElement('div'); toast.id = 'toast'; document.body.appendChild(toast); }
+  Object.assign(toast.style, { position:'fixed', bottom:'32px', left:'50%', transform:'translateX(-50%) translateY(20px)', background:'var(--surface)', color:'var(--text)', padding:'12px 24px', borderRadius:'12px', fontSize:'13px', fontWeight:'600', border:'1px solid var(--border)', boxShadow:'0 8px 32px rgba(0,0,0,0.4)', zIndex:'9999', opacity:'0', transition:'all 0.3s ease', fontFamily:"'Plus Jakarta Sans',sans-serif" });
+  toast.textContent = msg;
+  requestAnimationFrame(() => { toast.style.opacity = '1'; toast.style.transform = 'translateX(-50%) translateY(0)'; });
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(-50%) translateY(20px)'; }, 2500);
+}
+
+function renderTripPlanner() {
+  const cal = document.getElementById('tripCalendar');
+  cal.innerHTML = SCHEDULE.map((day, i) => `<button class="calendar-day" onclick="selectTripDay(${i}, this)">
+    <div class="calendar-day-num">Day ${day.day}</div>
+    ${day.date}
+    <div style="font-size: 10px; color: var(--text-secondary); margin-top: 4px;">${day.events.length} events</div>
+  </button>`).join('');
+}
+
+function selectTripDay(dayIndex, element) {
+  STATE.selectedTripDay = dayIndex;
+  document.querySelectorAll('#tripCalendar .calendar-day').forEach(btn => btn.classList.remove('selected'));
+  element.classList.add('selected');
+  const day = SCHEDULE[dayIndex];
+  document.getElementById('tripDayTitle').textContent = `${day.date} — ${day.events.length} events`;
+  const eventCards = day.events.map(e => renderJourneyCard(e)).join('');
+  document.getElementById('tripDayEvents').innerHTML = eventCards;
+  document.getElementById('tripDayView').style.display = 'block';
+}
+
+function renderSchedule() {
+  const cal = document.getElementById('scheduleCalendar');
+  cal.innerHTML = SCHEDULE.map((day, i) => `<button class="calendar-day ${i === 0 ? 'selected' : ''}" onclick="selectScheduleDay(${i}, this)">
+    <div class="calendar-day-num">Day ${day.day}</div>
+    ${day.date}
+  </button>`).join('');
+
+  const sports = ['All', ...new Set(SCHEDULE.flatMap(d => d.events.map(e => e.sport)))].slice(0, 12);
+  const pills = sports.map(s => `<button class="pill ${s === 'All' ? 'active' : ''}" onclick="setSportFilter('${s}', this)">${s}</button>`).join('');
+  document.getElementById('sportFilter').innerHTML = pills;
+
+  renderScheduleEvents();
+}
+
+function selectScheduleDay(dayIndex, element) {
+  STATE.selectedScheduleDay = dayIndex;
+  document.querySelectorAll('#scheduleCalendar .calendar-day').forEach(btn => btn.classList.remove('selected'));
+  element.classList.add('selected');
+  renderScheduleEvents();
+}
+
+function setSportFilter(sport, element) {
+  STATE.sportFilter = sport;
+  document.querySelectorAll('#sportFilter .pill').forEach(pill => pill.classList.remove('active'));
+  element.classList.add('active');
+  renderScheduleEvents();
+}
+
+function renderScheduleEvents() {
+  const day = SCHEDULE[STATE.selectedScheduleDay];
+  const filtered = STATE.sportFilter === 'All' ? day.events : day.events.filter(e => e.sport === STATE.sportFilter);
+  const events = filtered.map(e => `<div class="event-row" onclick="openEventDetail('${e.id}')" style="cursor:pointer;">
+    <div class="event-time">${e.time}</div>
+    <div class="event-info">
+      <div class="event-sport">${e.sport}</div>
+      <div class="event-round">${e.round}</div>
+      <div class="event-venue">${e.venue}</div>
+    </div>
+    <span class="badge crowd-${e.crowd}">● ${getCrowdLabel(e.crowd)}</span>
+    <div style="text-align: right; font-size: 12px; color: ${e.tickets === 'Sold Out' ? '#EE334E' : 'var(--text-secondary)'};">${e.tickets}</div>
+  </div>`).join('');
+  document.getElementById('scheduleEvents').innerHTML = events || '<p class="text-secondary">No events match your filters</p>';
+}
+
+function renderExplore(filter) {
+  filter = filter || 'All';
+  const types = ['All', ...new Set(EXPLORE_ITEMS.map(i => i.type))];
+  document.getElementById('exploreFilter').innerHTML = types.map(t => `<button class="pill ${t === filter ? 'active' : ''}" onclick="renderExplore('${t}')">${t}</button>`).join('');
+  const items = filter === 'All' ? EXPLORE_ITEMS : EXPLORE_ITEMS.filter(i => i.type === filter);
+  const cards = items.map(item => `<div class="explore-card" style="cursor:pointer;" onclick="openExploreDetail('${item.id}')">
+    <div class="explore-tag">${item.type}</div>
+    <div class="explore-title">${item.title}</div>
+    <div class="explore-desc">${item.description}</div>
+    <div class="explore-meta">${item.duration} • ${item.distance}</div>
+  </div>`).join('');
+  document.getElementById('exploreCards').innerHTML = cards;
+}
+
+function renderGroupMembers() {
+  const avatarColors = ['#0072BC','#EE334E','#00A651','#FDB913','#A05EB5'];
+  const members = GROUP_MEMBERS.map((m, i) => `<div class="member-row" style="cursor:pointer;" onclick="showToast('${m.name === 'You' ? 'That is you!' : m.name + ' profile'}')">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:36px;height:36px;border-radius:50%;background:${avatarColors[i % avatarColors.length]};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;">${m.name.charAt(0)}</div>
+      <div>
+        <div class="member-name">${m.name}</div>
+        <div class="member-email">${m.email}</div>
+      </div>
+    </div>
+    <div>${m.role}</div>
+    <div class="member-status ${m.status}">${m.status}</div>
+  </div>`).join('');
+  document.getElementById('groupMembers').innerHTML = members;
+  renderSharedEvents();
+  renderGroupChat();
+}
+
+function renderSharedEvents() {
+  const shared = MY_EVENTS.slice(0, 3);
+  const el = document.getElementById('sharedEvents');
+  if (!el) return;
+  el.innerHTML = shared.map(e => {
+    const attending = GROUP_MEMBERS.filter(() => Math.random() > 0.3);
+    return `<div class="card" style="padding:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div style="font-weight:600;font-size:14px;">${e.sport}</div>
+          <div style="font-size:12px;color:var(--text-secondary);">${e.round}</div>
+          <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">${e.venue} · ${e.date} · ${e.time}</div>
+        </div>
+        <span class="badge crowd-${e.crowd}" style="font-size:11px;">● ${getCrowdLabel(e.crowd)}</span>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:10px;align-items:center;">
+        <span style="font-size:11px;color:var(--text-secondary);">Going:</span>
+        ${attending.map((m, i) => `<span style="width:24px;height:24px;border-radius:50%;background:${['#0072BC','#EE334E','#00A651'][i%3]};display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;border:2px solid var(--bg);">${m.name.charAt(0)}</span>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+const GROUP_CHAT_MESSAGES = [
+  { from: 'Sarah Chen', msg: 'Just got to Union Station! The E Line is running on time 🚇', time: '2:30 PM' },
+  { from: 'You', msg: 'Nice! I\'m heading to 7th/Metro in about 20 min', time: '2:35 PM' },
+  { from: 'Marco Rossi', msg: 'Can we meet at Grand Central Market before the Track event? Want to grab food', time: '2:41 PM' },
+  { from: 'Sarah Chen', msg: 'Yes! I saw they have a new pupusa stand. Let\'s meet at 5?', time: '2:43 PM' },
+  { from: 'You', msg: 'Perfect, see you there 👍', time: '2:45 PM' },
+];
+
+function renderGroupChat() {
+  const el = document.getElementById('groupChat');
+  if (!el) return;
+  el.innerHTML = GROUP_CHAT_MESSAGES.map(m => `<div style="margin-bottom:12px;${m.from === 'You' ? 'text-align:right;' : ''}">
+    <div style="font-size:11px;color:var(--text-secondary);margin-bottom:3px;">${m.from} · ${m.time}</div>
+    <div style="display:inline-block;max-width:85%;padding:8px 12px;border-radius:12px;font-size:13px;${m.from === 'You' ? 'background:var(--accent);color:#fff;border-bottom-right-radius:4px;' : 'background:var(--surface-alt, rgba(255,255,255,0.06));border-bottom-left-radius:4px;'}">${m.msg}</div>
+  </div>`).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+function sendGroupChat() {
+  const input = document.getElementById('chatInput');
+  if (!input.value.trim()) return;
+  const now = new Date();
+  const time = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  GROUP_CHAT_MESSAGES.push({ from: 'You', msg: input.value.trim(), time });
+  input.value = '';
+  renderGroupChat();
+}
+
+function dismissAlert(alertId, evt) {
+  evt.stopPropagation();
+  const el = document.getElementById('alert-' + alertId);
+  if (el) { el.style.transition = 'all 0.3s ease'; el.style.opacity = '0'; el.style.maxHeight = '0'; el.style.padding = '0'; el.style.margin = '0'; el.style.overflow = 'hidden'; setTimeout(() => el.remove(), 300); }
+}
+
+function openEventDetail(eventId) {
+  const event = SCHEDULE.flatMap(d => d.events).find(e => e.id === eventId);
+  if (!event) return;
+  const venue = VENUES.find(v => v.name === event.venue) || {};
+  const inTrip = STATE.tripEvents.find(e => e.id === eventId);
+  document.getElementById('eventDetailContent').innerHTML = `
+    <div style="padding:32px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">
+        <div>
+          <div style="font-size:11px;color:var(--accent);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">${event.sport}</div>
+          <div style="font-size:22px;font-weight:700;">${event.round}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:28px;font-weight:700;">${event.time}</div>
+          <div style="font-size:12px;color:var(--text-secondary);">${event.date || SCHEDULE[STATE.selectedScheduleDay]?.date || ''}</div>
+        </div>
+      </div>
+      <div class="card" style="padding:16px;margin-bottom:16px;">
+        <div style="font-weight:600;margin-bottom:4px;">📍 ${event.venue}</div>
+        <div style="font-size:12px;color:var(--text-secondary);">${venue.area ? venue.area + ' · ' : ''}${venue.capacity ? 'Capacity: ' + venue.capacity : ''}</div>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <span class="badge crowd-${event.crowd}">● ${getCrowdLabel(event.crowd)}</span>
+          <span style="font-size:12px;color:${event.tickets==='Sold Out'?'#EE334E':'#00A651'};font-weight:600;">${event.tickets}</span>
+        </div>
+      </div>
+      ${venue.lat ? `<div class="card" style="padding:16px;margin-bottom:16px;">
+        <div style="font-weight:600;margin-bottom:8px;">🚇 Getting There</div>
+        <div style="font-size:13px;color:var(--text-secondary);line-height:1.6;">Take the <span class="badge transit" style="background:${getLineColor('E')};font-size:11px;">E</span> Line to Expo Park/USC, then walk 10 min to venue. Allow 45 min total from DTLA.</div>
+      </div>` : ''}
+      <div class="card" style="padding:16px;margin-bottom:20px;">
+        <div style="font-weight:600;margin-bottom:8px;">ℹ️ Event Info</div>
+        <div style="font-size:13px;color:var(--text-secondary);line-height:1.6;">Gates open 90 min before event. Clear bag policy in effect. Sunscreen and water bottles (empty) permitted. Re-entry allowed with credential.</div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="addToTrip('${event.id}', event);document.getElementById('eventDetailModal').style.display='none';" style="flex:1;padding:14px;border-radius:12px;background:${inTrip ? 'var(--surface)' : 'var(--accent)'};color:${inTrip ? 'var(--text-secondary)' : '#fff'};border:${inTrip ? '1px solid var(--border)' : 'none'};cursor:pointer;font-weight:700;font-size:14px;">${inTrip ? '✓ In your trip' : '+ Add to Trip'}</button>
+        <button onclick="document.getElementById('eventDetailModal').style.display='none'" style="padding:14px 20px;border-radius:12px;background:var(--surface);color:var(--text-secondary);border:1px solid var(--border);cursor:pointer;font-size:14px;">Close</button>
+      </div>
+    </div>`;
+  document.getElementById('eventDetailModal').style.display = 'flex';
+}
+
+function openExploreDetail(itemId) {
+  const item = EXPLORE_ITEMS.find(i => i.id === itemId);
+  if (!item) return;
+  const nearbyPOIs = TRANSIT_POIS.filter(p => {
+    if (item.neighborhood === 'DTLA' && ['A','B','E'].some(l => p.nearLine === l)) return true;
+    if (item.neighborhood === 'Coastal' && p.nearLine === 'E') return true;
+    if (item.neighborhood === 'Koreatown' && p.nearLine === 'D') return true;
+    if (item.neighborhood === 'Hollywood' && p.nearLine === 'B') return true;
+    if (item.neighborhood === 'Leimert Park' && p.nearLine === 'K') return true;
+    return false;
+  }).slice(0, 4);
+
+  document.getElementById('exploreDetail').innerHTML = `
+    <button onclick="closeExploreDetail()" style="background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:14px;margin-bottom:20px;display:flex;align-items:center;gap:6px;">← Back to Explore</button>
+    <h2 class="title-large">${item.title}</h2>
+    <div style="display:flex;gap:8px;margin:8px 0 20px;">
+      <span style="font-size:12px;padding:4px 10px;border-radius:6px;background:rgba(255,255,255,0.06);color:var(--accent);font-weight:600;">${item.type}</span>
+      <span style="font-size:12px;padding:4px 10px;border-radius:6px;background:rgba(255,255,255,0.06);color:var(--text-secondary);">${item.duration}</span>
+      <span style="font-size:12px;padding:4px 10px;border-radius:6px;background:rgba(255,255,255,0.06);color:var(--text-secondary);">${item.distance}</span>
+    </div>
+    <p style="font-size:15px;line-height:1.7;color:var(--text-secondary);margin-bottom:32px;max-width:640px;">${item.description}</p>
+
+    <div class="grid-2" style="gap:32px;">
+      <div>
+        <span class="label" style="margin-bottom:16px;">What to Expect</span>
+        <div class="card" style="padding:16px;">
+          <div style="font-size:13px;color:var(--text-secondary);line-height:1.8;">
+            ${item.type === 'Walking Tour' ? '🚶 Self-guided walking route through the neighborhood. Wear comfortable shoes and bring water. Best experienced in the morning or late afternoon.' : item.type === 'Neighborhood' ? '🏘️ Explore at your own pace. Wander the streets, pop into shops, and discover local culture. Many restaurants and cafes to stop at along the way.' : item.type === 'Food & Culture' ? '🍜 Come hungry! Best to visit during lunch (11am-2pm) or dinner (5-8pm). Most vendors accept cards. Seating is first-come-first-served.' : item.type === 'Art & Culture' ? '🎨 Check hours before visiting. Some exhibits require timed tickets. Photography usually allowed. Gift shop worth browsing.' : '📍 A must-visit LA landmark. Plan to spend the full duration listed. Check for any special events or closures before visiting.'}
+          </div>
+        </div>
+      </div>
+      <div>
+        <span class="label" style="margin-bottom:16px;">Nearby Food & Activities</span>
+        ${nearbyPOIs.length ? nearbyPOIs.map(p => `<div class="card" style="padding:12px;margin-bottom:8px;cursor:pointer;" onclick="showToast('${p.name} — ${p.desc.replace(/'/g, "\\'")}')">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="width:8px;height:8px;border-radius:50%;background:${p.type==='food'?'#3DDC84':'#64B5F6'};"></span>
+            <span style="font-weight:600;font-size:13px;">${p.name}</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;margin-left:16px;">${p.desc}</div>
+        </div>`).join('') : '<div class="card" style="padding:12px;"><p class="text-secondary">Explore the area to discover local gems.</p></div>'}
+      </div>
+    </div>
+
+    <div style="margin-top:32px;">
+      <span class="label" style="margin-bottom:16px;">Getting There</span>
+      <div class="card" style="padding:16px;">
+        <div style="font-size:13px;color:var(--text-secondary);line-height:1.7;">🚇 ${item.distance}. ${item.neighborhood === 'DTLA' ? 'Take the B or E Line to 7th St/Metro Center, then walk.' : item.neighborhood === 'Coastal' ? 'Take the E Line to Downtown Santa Monica station.' : item.neighborhood === 'Hollywood' ? 'Take the B Line to Hollywood/Highland.' : item.neighborhood === 'Westwood' ? 'Take the D Line to Westwood/UCLA.' : 'Check the Transit Map for the best route from your location.'}</div>
+      </div>
+    </div>
+  `;
+  document.getElementById('exploreList').style.display = 'none';
+  document.getElementById('exploreDetail').style.display = 'block';
+}
+
+function closeExploreDetail() {
+  document.getElementById('exploreDetail').style.display = 'none';
+  document.getElementById('exploreList').style.display = 'block';
+}
+
+function renderMyItinerary() {
+  const el = document.getElementById('myItinerary');
+  if (!el) return;
+  if (STATE.tripEvents.length === 0) {
+    el.innerHTML = '<div class="card" style="padding:24px;text-align:center;"><p class="text-secondary">No events yet. Browse the Schedule or Today view and add events to build your itinerary.</p></div>';
+    return;
+  }
+  const sorted = [...STATE.tripEvents].sort((a, b) => { const da = a.date || ''; const db = b.date || ''; if (da !== db) return da.localeCompare(db); return (a.time || '').localeCompare(b.time || ''); });
+  let lastDate = '';
+  el.innerHTML = sorted.map(e => {
+    const dateHeader = e.date !== lastDate ? `<div style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em;margin-top:${lastDate ? '20px' : '0'};margin-bottom:8px;">${e.date || 'Unscheduled'}</div>` : '';
+    lastDate = e.date;
+    return dateHeader + `<div class="card" style="padding:14px;display:flex;justify-content:space-between;align-items:center;">
+      <div style="flex:1;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-weight:700;font-size:16px;color:var(--text);">${e.time || ''}</span>
+          <span style="font-weight:600;">${e.sport}</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">${e.round} · ${e.venue}</div>
+      </div>
+      <button onclick="removeFromTrip('${e.id}')" style="background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:16px;padding:4px 8px;opacity:0.5;transition:opacity 0.15s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5">✕</button>
+    </div>`;
+  }).join('');
+}
+
+// MAP — Mapbox GL JS
+const METRO_STATIONS = {
+  A: [{name:'Downtown Long Beach',lat:33.7680,lng:-118.1893},{name:'Wardlow',lat:33.8025,lng:-118.1965},{name:'Willow',lat:33.8193,lng:-118.1953},{name:'Del Amo',lat:33.8484,lng:-118.1975},{name:'Artesia',lat:33.8756,lng:-118.2191},{name:'Compton',lat:33.8969,lng:-118.2274},{name:'Willowbrook/Rosa Parks',lat:33.9219,lng:-118.2388},{name:'103rd/Watts Towers',lat:33.9425,lng:-118.2430},{name:'Firestone',lat:33.9633,lng:-118.2531},{name:'Florence',lat:33.9752,lng:-118.2551},{name:'Slauson',lat:33.9887,lng:-118.2587},{name:'Vernon',lat:34.0034,lng:-118.2595},{name:'Washington',lat:34.0180,lng:-118.2573},{name:'San Pedro',lat:34.0290,lng:-118.2558},{name:'Pico',lat:34.0410,lng:-118.2595},{name:'7th St/Metro Center',lat:34.0487,lng:-118.2590},{name:'Union Station',lat:34.0561,lng:-118.2365}],
+  B: [{name:'North Hollywood',lat:34.1683,lng:-118.3767},{name:'Universal City',lat:34.1415,lng:-118.3585},{name:'Hollywood/Highland',lat:34.1061,lng:-118.3270},{name:'Hollywood/Vine',lat:34.1017,lng:-118.3249},{name:'Vermont/Sunset',lat:34.0928,lng:-118.2916},{name:'Vermont/Santa Monica',lat:34.0760,lng:-118.2916},{name:'Vermont/Beverly',lat:34.0647,lng:-118.2916},{name:'Wilshire/Vermont',lat:34.0628,lng:-118.2916},{name:'Westlake/MacArthur Park',lat:34.0567,lng:-118.2752},{name:'7th St/Metro Center',lat:34.0487,lng:-118.2590},{name:'Pershing Square',lat:34.0494,lng:-118.2516},{name:'Civic Center',lat:34.0545,lng:-118.2455},{name:'Union Station',lat:34.0561,lng:-118.2365}],
+  C: [{name:'Norwalk',lat:33.9139,lng:-118.1068},{name:'Lakewood',lat:33.9039,lng:-118.1335},{name:'Long Beach Blvd',lat:33.9019,lng:-118.1554},{name:'Willowbrook/Rosa Parks',lat:33.9219,lng:-118.2388},{name:'Harbor Freeway',lat:33.9293,lng:-118.2816},{name:'Vermont/Athens',lat:33.9293,lng:-118.2916},{name:'Crenshaw',lat:33.9249,lng:-118.3297},{name:'Hawthorne',lat:33.9131,lng:-118.3501},{name:'Aviation/LAX',lat:33.9340,lng:-118.3808},{name:'Mariposa',lat:33.9480,lng:-118.3854},{name:'El Segundo',lat:33.9161,lng:-118.3866},{name:'Douglas',lat:33.9049,lng:-118.3894},{name:'Redondo Beach',lat:33.8961,lng:-118.3951}],
+  D: [{name:'Wilshire/Vermont',lat:34.0628,lng:-118.2916},{name:'Wilshire/Normandie',lat:34.0615,lng:-118.3011},{name:'Wilshire/Western',lat:34.0624,lng:-118.3089},{name:'Wilshire/La Brea',lat:34.0620,lng:-118.3435},{name:'Wilshire/Fairfax',lat:34.0615,lng:-118.3614},{name:'Wilshire/La Cienega',lat:34.0616,lng:-118.3762},{name:'Westwood/UCLA',lat:34.0631,lng:-118.4455}],
+  E: [{name:'East LA Civic Center',lat:34.0333,lng:-118.1610},{name:'Maravilla',lat:34.0291,lng:-118.1691},{name:'Indiana',lat:34.0339,lng:-118.1933},{name:'Soto',lat:34.0439,lng:-118.2101},{name:'Mariachi Plaza',lat:34.0471,lng:-118.2191},{name:'Pico/Aliso',lat:34.0484,lng:-118.2264},{name:'Little Tokyo',lat:34.0505,lng:-118.2381},{name:'7th St/Metro Center',lat:34.0487,lng:-118.2590},{name:'Pico',lat:34.0410,lng:-118.2595},{name:'LATTC',lat:34.0335,lng:-118.2587},{name:'Jefferson/USC',lat:34.0225,lng:-118.2793},{name:'Expo Park/USC',lat:34.0182,lng:-118.2858},{name:'Expo/Vermont',lat:34.0182,lng:-118.2916},{name:'Expo/Western',lat:34.0182,lng:-118.3089},{name:'Expo/Crenshaw',lat:34.0232,lng:-118.3352},{name:'Farmdale',lat:34.0236,lng:-118.3460},{name:'Expo/La Brea',lat:34.0228,lng:-118.3505},{name:'La Cienega/Jefferson',lat:34.0258,lng:-118.3707},{name:'Culver City',lat:34.0289,lng:-118.3865},{name:'Palms',lat:34.0293,lng:-118.3965},{name:'Westwood/Rancho Park',lat:34.0363,lng:-118.4236},{name:'Expo/Sepulveda',lat:34.0321,lng:-118.4324},{name:'Expo/Bundy',lat:34.0254,lng:-118.4529},{name:'26th St/Bergamot',lat:34.0159,lng:-118.4698},{name:'17th St/SMC',lat:34.0142,lng:-118.4823},{name:'Downtown Santa Monica',lat:34.0131,lng:-118.4943}],
+  K: [{name:'Expo/Crenshaw',lat:34.0232,lng:-118.3352},{name:'Leimert Park',lat:33.9960,lng:-118.3352},{name:'Hyde Park',lat:33.9825,lng:-118.3352},{name:'Fairview Heights',lat:33.9720,lng:-118.3352},{name:'Downtown Inglewood',lat:33.9616,lng:-118.3466},{name:'Westchester/Veterans',lat:33.9590,lng:-118.3754},{name:'Aviation/Century',lat:33.9453,lng:-118.3808}],
+  G: [{name:'Chatsworth',lat:34.2594,lng:-118.5855},{name:'Northridge',lat:34.2380,lng:-118.5492},{name:'Reseda',lat:34.2015,lng:-118.5375},{name:'Balboa',lat:34.1802,lng:-118.5020},{name:'Woodley',lat:34.1683,lng:-118.4908},{name:'Sepulveda',lat:34.1563,lng:-118.4690},{name:'Van Nuys',lat:34.1478,lng:-118.4489},{name:'Valley College',lat:34.1539,lng:-118.4217},{name:'Laurel Canyon',lat:34.1625,lng:-118.3960},{name:'North Hollywood',lat:34.1683,lng:-118.3767}],
+  J: [{name:'El Monte',lat:34.0742,lng:-118.0292},{name:'Cal State LA',lat:34.0667,lng:-118.1690},{name:'Union Station',lat:34.0561,lng:-118.2365},{name:'Harbor Gateway',lat:33.8744,lng:-118.2854},{name:'San Pedro',lat:33.7353,lng:-118.2818}],
+};
+
+const TRANSIT_POIS = [
+  {name:'Grand Central Market',type:'food',lat:34.0508,lng:-118.2488,nearLine:'B',desc:'Historic food hall — 40+ vendors, ramen to pupusas'},
+  {name:'The Broad',type:'activity',lat:34.0545,lng:-118.2505,nearLine:'B',desc:'Free contemporary art museum on Grand Ave'},
+  {name:'Olvera Street',type:'activity',lat:34.0580,lng:-118.2386,nearLine:'B',desc:'Birthplace of LA — Mexican marketplace & historic district'},
+  {name:'Howlin\' Ray\'s',type:'food',lat:34.0492,lng:-118.2379,nearLine:'B',desc:'Famous Nashville hot chicken in Chinatown'},
+  {name:'Koreatown BBQ Row',type:'food',lat:34.0624,lng:-118.3352,nearLine:'D',desc:'Korean BBQ corridor along 6th & Western'},
+  {name:'LACMA',type:'activity',lat:34.0638,lng:-118.3592,nearLine:'D',desc:'LA County Museum of Art + Urban Light installation'},
+  {name:'Santa Monica Pier',type:'activity',lat:34.0095,lng:-118.4973,nearLine:'E',desc:'Iconic oceanfront pier with rides & food'},
+  {name:'Gjusta',type:'food',lat:34.0005,lng:-118.4660,nearLine:'E',desc:'Beloved Venice bakery & deli'},
+  {name:'Exposition Park',type:'activity',lat:34.0170,lng:-118.2870,nearLine:'E',desc:'Natural History Museum, Science Center & Rose Garden'},
+  {name:'Cielito Lindo',type:'food',lat:34.0580,lng:-118.2395,nearLine:'A',desc:'Famous beef taquitos on Olvera St since 1934'},
+  {name:'Angels Flight',type:'activity',lat:34.0514,lng:-118.2507,nearLine:'A',desc:'World\'s shortest railway — historic Bunker Hill funicular'},
+  {name:'Langer\'s Deli',type:'food',lat:34.0575,lng:-118.2762,nearLine:'B',desc:'#19 pastrami sandwich — best in the country'},
+  {name:'Little Tokyo',type:'activity',lat:34.0498,lng:-118.2395,nearLine:'E',desc:'Japanese Village Plaza, ramen shops, JANM museum'},
+  {name:'Mercado La Paloma',type:'food',lat:34.0191,lng:-118.2730,nearLine:'E',desc:'Community food court — Oaxacan, Thai, Mexican'},
+  {name:'The Getty',type:'activity',lat:34.0780,lng:-118.4741,nearLine:'E',desc:'World-class art + panoramic LA views (free admission)'},
+  {name:'Leimert Park Village',type:'activity',lat:33.9960,lng:-118.3352,nearLine:'K',desc:'Jazz clubs, art galleries & African-American culture hub'},
+  {name:'Randy\'s Donuts',type:'food',lat:33.9571,lng:-118.3803,nearLine:'K',desc:'Iconic giant donut landmark near Inglewood'},
+  {name:'CicLAvia Route',type:'activity',lat:34.0425,lng:-118.2518,nearLine:'B',desc:'Open streets festival — car-free cycling through LA'},
+  {name:'Philippe\'s',type:'food',lat:34.0581,lng:-118.2367,nearLine:'A',desc:'Inventor of the French dip sandwich — since 1908'},
+  {name:'Arts District Breweries',type:'food',lat:34.0396,lng:-118.2298,nearLine:'E',desc:'Angel City, Arts District Brewing & more'},
+];
+
+function initializeMap() {
+  if (STATE.map) return;
+  mapboxgl.accessToken = 'pk.eyJ1IjoiYmthc2UyNSIsImEiOiJjbW14YjNodmUxOGptM3dwdzkycnZ3YTR5In0.X7AMyn-wf47WxFyaNegjFA';
+  STATE.map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/dark-v11',
+    center: [-118.25, 34.05],
+    zoom: 9.5,
+  });
+  STATE.map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+  STATE.map.on('load', () => {
+    addMetroLines();
+    addStationMarkers();
+    addVenueMarkers();
+    addPOIMarkers();
+  });
+}
+
+function addMetroLines() {
+  Object.entries(METRO_COORDS).forEach(([lineId, coords]) => {
+    const line = METROS_LINES.find(l => l.id === lineId);
+    const geojson = coords.map(([lat, lng]) => [lng, lat]);
+    STATE.map.addSource(`metro-${lineId}`, {
+      type: 'geojson',
+      data: { type: 'Feature', properties: { id: lineId, name: line.name, route: line.route }, geometry: { type: 'LineString', coordinates: geojson } }
+    });
+    // Glow layer
+    STATE.map.addLayer({ id: `metro-glow-${lineId}`, type: 'line', source: `metro-${lineId}`, paint: { 'line-color': line.color, 'line-width': 8, 'line-opacity': 0.15, 'line-blur': 4 }, layout: { 'line-join': 'round', 'line-cap': 'round' } });
+    // Main line
+    STATE.map.addLayer({ id: `metro-line-${lineId}`, type: 'line', source: `metro-${lineId}`, paint: { 'line-color': line.color, 'line-width': 3, 'line-opacity': 0.85 }, layout: { 'line-join': 'round', 'line-cap': 'round' } });
+    // Click target (invisible wider line)
+    STATE.map.addLayer({ id: `metro-click-${lineId}`, type: 'line', source: `metro-${lineId}`, paint: { 'line-color': line.color, 'line-width': 18, 'line-opacity': 0 }, layout: { 'line-join': 'round', 'line-cap': 'round' } });
+    STATE.map.on('click', `metro-click-${lineId}`, (e) => {
+      const stations = METRO_STATIONS[lineId] || [];
+      new mapboxgl.Popup({ maxWidth: '260px' }).setLngLat(e.lngLat).setHTML(
+        `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span style="background:${line.color};color:#fff;padding:2px 10px;border-radius:6px;font-weight:700;font-size:13px;">${line.name}</span></div>
+         <div style="font-size:12px;margin-bottom:4px;">${line.route}</div>
+         <div style="font-size:11px;color:var(--text-secondary);">${stations.length} stations</div>`
+      ).addTo(STATE.map);
+    });
+    STATE.map.on('mouseenter', `metro-click-${lineId}`, () => { STATE.map.getCanvas().style.cursor = 'pointer'; STATE.map.setPaintProperty(`metro-line-${lineId}`, 'line-width', 5); });
+    STATE.map.on('mouseleave', `metro-click-${lineId}`, () => { STATE.map.getCanvas().style.cursor = ''; STATE.map.setPaintProperty(`metro-line-${lineId}`, 'line-width', 3); });
+  });
+}
+
+function addStationMarkers() {
+  Object.entries(METRO_STATIONS).forEach(([lineId, stations]) => {
+    const line = METROS_LINES.find(l => l.id === lineId);
+    stations.forEach(s => {
+      const el = document.createElement('div');
+      el.className = 'station-dot';
+      el.style.backgroundColor = '#1a1a1a';
+      el.style.borderColor = line.color;
+      const marker = new mapboxgl.Marker({ element: el })
+        .setLngLat([s.lng, s.lat])
+        .setPopup(new mapboxgl.Popup({ offset: 8 }).setHTML(
+          `<div style="font-weight:600;margin-bottom:2px;">${s.name}</div><div style="font-size:11px;color:var(--text-secondary);display:flex;align-items:center;gap:5px;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${line.color};"></span>${line.name} — ${line.route}</div>`
+        ))
+        .addTo(STATE.map);
+      STATE.mapMarkers.push({ marker, type: 'station', el });
+    });
+  });
+}
+
+function addVenueMarkers() {
+  VENUES.forEach(venue => {
+    const el = document.createElement('div');
+    el.className = 'venue-dot';
+    const popup = new mapboxgl.Popup({ offset: 12 }).setHTML(
+      `<div style="font-weight:700;font-size:14px;margin-bottom:4px;">${venue.name}</div>
+       <div style="font-size:12px;margin-bottom:2px;">${venue.sport}</div>
+       <div style="font-size:11px;color:var(--text-secondary);">${venue.area} · Capacity: ${venue.capacity}</div>
+       <div style="margin-top:6px;font-size:11px;display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${venue.crowd==='extreme'?'#EE334E':venue.crowd==='high'?'#FDB913':venue.crowd==='moderate'?'#0072BC':'#00A651'};"></span>Crowd: ${getCrowdLabel(venue.crowd)}</div>`
+    );
+    const marker = new mapboxgl.Marker({ element: el })
+      .setLngLat([venue.lng, venue.lat])
+      .setPopup(popup)
+      .addTo(STATE.map);
+    el.addEventListener('click', () => showVenueDetail(venue));
+    STATE.mapMarkers.push({ marker, type: 'venue', el });
+  });
+}
+
+function addPOIMarkers() {
+  TRANSIT_POIS.forEach(poi => {
+    const el = document.createElement('div');
+    el.className = 'poi-dot';
+    el.style.backgroundColor = poi.type === 'food' ? '#3DDC84' : '#64B5F6';
+    el.style.display = STATE.mapLayers.pois ? 'block' : 'none';
+    const line = METROS_LINES.find(l => l.id === poi.nearLine);
+    const popup = new mapboxgl.Popup({ offset: 8 }).setHTML(
+      `<div style="font-weight:600;margin-bottom:3px;">${poi.name}</div>
+       <div style="font-size:11px;margin-bottom:4px;">${poi.desc}</div>
+       <div style="font-size:11px;color:var(--text-secondary);display:flex;align-items:center;gap:5px;"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${poi.type==='food'?'#3DDC84':'#64B5F6'};"></span>${poi.type === 'food' ? 'Food & Drink' : 'Things to Do'} · near <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${line?.color||'#666'};"></span> ${line?.name||''}</div>`
+    );
+    const marker = new mapboxgl.Marker({ element: el })
+      .setLngLat([poi.lng, poi.lat])
+      .setPopup(popup)
+      .addTo(STATE.map);
+    STATE.mapMarkers.push({ marker, type: 'poi', el });
+  });
+}
+
+function toggleMapLayer(layer) {
+  STATE.mapLayers[layer] = !STATE.mapLayers[layer];
+  event.target.classList.toggle('active');
+  if (!STATE.map || !STATE.map.isStyleLoaded()) return;
+  if (layer === 'lines') {
+    METROS_LINES.forEach(l => {
+      const vis = STATE.mapLayers.lines ? 'visible' : 'none';
+      ['metro-glow-','metro-line-','metro-click-'].forEach(prefix => {
+        if (STATE.map.getLayer(prefix + l.id)) STATE.map.setLayoutProperty(prefix + l.id, 'visibility', vis);
+      });
+    });
+  }
+  if (layer === 'stations' || layer === 'venues' || layer === 'pois') {
+    const show = STATE.mapLayers[layer];
+    STATE.mapMarkers.filter(m => m.type === (layer === 'stations' ? 'station' : layer === 'venues' ? 'venue' : 'poi')).forEach(m => { m.el.style.display = show ? 'block' : 'none'; });
+  }
+}
+
+function showVenueDetail(venue) {
+  STATE.selectedVenue = venue;
+  document.getElementById('venueName').textContent = venue.name;
+  document.getElementById('venueSport').textContent = venue.sport;
+  document.getElementById('venueCrowd').textContent = `Crowd: ${getCrowdLabel(venue.crowd)}`;
+  document.getElementById('venueDetail').style.display = 'block';
+}
+
+// CREDENTIAL
+function showCredential() {
+  const roleNames = { athlete: 'Athlete', spectator: 'Spectator', volunteer: 'Volunteer', press: 'Press' };
+  const zones = {
+    athlete: ['Competition Zone','Athlete Village','Training Facilities','Mixed Zone'],
+    spectator: ['General Admission','Ticketed Venues'],
+    volunteer: ['Assigned Venue','Volunteer Center','Staff Areas'],
+    press: ['Press Center','Mixed Zone','Photo Positions','Press Conference Rooms'],
+  };
+
+  document.getElementById('credRole').textContent = roleNames[STATE.role];
+  document.getElementById('credRoleTag').textContent = roleNames[STATE.role];
+  document.getElementById('zonesList').innerHTML = zones[STATE.role].map(z => `<div class="zone-tag">${z}</div>`).join('');
+
+  if (STATE.role === 'athlete' || STATE.role === 'volunteer') {
+    document.getElementById('mealVoucher').style.display = 'block';
+  } else {
+    document.getElementById('mealVoucher').style.display = 'none';
+  }
+
+  // Generate QR
+  generateQR();
+  document.getElementById('credentialModal').classList.add('active');
+}
+
+function closeCredential() {
+  document.getElementById('credentialModal').classList.remove('active');
+}
+
+function generateQR() {
+  const svg = document.getElementById('qrCode');
+  svg.innerHTML = Array.from({ length: 14 }, (_, r) => Array.from({ length: 14 }, (_, c) => {
+    const on = ((r * 7 + c * 13 + r * c) % 3) !== 0;
+    return on ? `<rect x="${c * 10}" y="${r * 10}" width="9" height="9" rx="1" fill="#1a1a1a"/>` : '';
+  }).join('')).join('');
+}
+</script>
+
+</body>
+</html>
