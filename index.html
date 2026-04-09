@@ -3637,31 +3637,23 @@ function renderInterestSelection() {
   var container = document.getElementById('interestGrid');
   if (!container) return;
 
-  // Use the SPORTS array if available, otherwise fall back to a default set.
-  // Skip 'All' if present since it is a filter label, not a sport.
-  var sportsList = (typeof SPORTS !== 'undefined') ? SPORTS : [
-    'Track & Field', 'Swimming', 'Basketball', 'Soccer',
-    'Rowing', 'Gymnastics', 'Tennis', 'Volleyball',
-    'Cycling', 'Surfing', 'Skateboarding', 'Baseball'
-  ];
+  // Use the SPORTS array (objects with id, name, icon) if available
+  var sportsList = (typeof SPORTS !== 'undefined' && Array.isArray(SPORTS) && SPORTS.length > 0 && typeof SPORTS[0] === 'object')
+    ? SPORTS
+    : [
+        { id: 'athletics', name: 'Track & Field', icon: '🏃' },
+        { id: 'swimming', name: 'Swimming', icon: '🏊' },
+        { id: 'basketball', name: 'Basketball', icon: '🏀' },
+        { id: 'football', name: 'Soccer', icon: '⚽' },
+      ];
 
-  var sportIcons = {
-    'Track & Field': '🏃', 'Swimming': '🏊', 'Basketball': '🏀',
-    'Soccer': '⚽', 'Rowing': '🚣', 'Gymnastics': '🤸',
-    'Tennis': '🎾', 'Volleyball': '🏐', 'Cycling': '🚴',
-    'Surfing': '🏄', 'Skateboarding': '🛹', 'Baseball': '⚾',
-    'Diving': '🤿', 'Boxing': '🥊', 'Fencing': '🤺',
-    'Archery': '🏹', 'Weightlifting': '🏋️', 'Wrestling': '🤼',
-  };
-
-  container.innerHTML = sportsList
-    .filter(function (s) { return s !== 'All'; })
-    .map(function (sport) {
-      var isSelected = STATE.interests.indexOf(sport) !== -1;
-      var icon = sportIcons[sport] || '🏅';
-      return '<div class="interest-card' + (isSelected ? ' selected' : '') + '" onclick="toggleInterest(\'' + sport.replace(/'/g, "\\'") + '\')">'
+  container.innerHTML = sportsList.map(function (sport) {
+      var sportId = sport.id || sport.name;
+      var isSelected = STATE.interests.indexOf(sportId) !== -1;
+      var icon = sport.icon || '🏅';
+      return '<div class="interest-card' + (isSelected ? ' selected' : '') + '" onclick="toggleInterest(\'' + sportId.replace(/'/g, "\\'") + '\')">'
         + '<span class="interest-icon">' + icon + '</span>'
-        + '<span class="interest-name">' + sport + '</span>'
+        + '<span class="interest-name">' + sport.name + '</span>'
         + '</div>';
     }).join('');
 
@@ -3722,7 +3714,11 @@ function renderOnboardingComplete() {
       parts.push('Role: ' + (roleNames[STATE.role] || STATE.role));
     }
     if (STATE.interests.length > 0) {
-      parts.push('Interests: ' + STATE.interests.join(', '));
+      var names = STATE.interests.map(function(id) {
+        var s = (typeof SPORTS !== 'undefined') && SPORTS.find(function(sp) { return sp.id === id; });
+        return s ? s.name : id;
+      });
+      parts.push('Interests: ' + names.join(', '));
     }
     if (STATE.language && STATE.language !== 'en') {
       var langNames = { en: 'English', es: 'Español', fr: 'Français', zh: '中文' };
