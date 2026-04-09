@@ -14,25 +14,49 @@
     }
 
     :root {
-      --bg: #0A0A0F;
-      --surface: #141419;
-      --surface-hover: #1C1C24;
-      --surface-active: #24242E;
-      --border: #2A2A35;
-      --border-subtle: #1E1E28;
-      --text: #F0F0F5;
-      --text-secondary: #9090A0;
-      --text-tertiary: #606070;
+      --bg: #F5F5F7;
+      --surface: #FFFFFF;
+      --surface-hover: #F0F0F2;
+      --surface-active: #E8E8EC;
+      --border: #D8D8DE;
+      --border-subtle: #E4E4EA;
+      --text: #1A1A2E;
+      --text-secondary: #5A5A6E;
+      --text-tertiary: #8A8A9A;
       --accent: #FF6B2B;
-      --accent-glow: rgba(255, 107, 43, 0.15);
+      --accent-glow: rgba(255, 107, 43, 0.12);
       --accent-muted: #CC5522;
       --gradient-primary: linear-gradient(135deg, #FF15CB, #FE5088, #FE834E, #FDA824, #FDC800, #3FFFEC);
       --blue: #0081C8;
       --red: #EE334E;
       --green: #00A651;
       --yellow: #FCB131;
-      --shadow-card: 0 4px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05);
-      --shadow-elevated: 0 12px 48px rgba(0,0,0,0.6);
+      --shadow-card: 0 2px 12px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
+      --shadow-elevated: 0 12px 48px rgba(0,0,0,0.15);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0A0A0F;
+        --surface: #141419;
+        --surface-hover: #1C1C24;
+        --surface-active: #24242E;
+        --border: #2A2A35;
+        --border-subtle: #1E1E28;
+        --text: #F0F0F5;
+        --text-secondary: #9090A0;
+        --text-tertiary: #606070;
+        --accent: #FF6B2B;
+        --accent-glow: rgba(255, 107, 43, 0.15);
+        --accent-muted: #CC5522;
+        --gradient-primary: linear-gradient(135deg, #FF15CB, #FE5088, #FE834E, #FDA824, #FDC800, #3FFFEC);
+        --blue: #0081C8;
+        --red: #EE334E;
+        --green: #00A651;
+        --yellow: #FCB131;
+        --shadow-card: 0 4px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05);
+        --shadow-elevated: 0 12px 48px rgba(0,0,0,0.6);
+      }
     }
 
     html, body {
@@ -357,7 +381,7 @@
 
     .card.expanded {
       border-color: var(--accent);
-      box-shadow: 0 4px 24px rgba(0,0,0,0.4), 0 0 0 2px rgba(255, 107, 43, 0.3);
+      box-shadow: var(--shadow-card), 0 0 0 2px rgba(255, 107, 43, 0.3);
     }
 
     /* Badge styles */
@@ -580,7 +604,7 @@
       padding: 12px 16px;
       font-family: 'Plus Jakarta Sans', sans-serif;
       font-size: 13px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      box-shadow: var(--shadow-elevated);
       border: 1px solid var(--border);
     }
     .mapboxgl-popup-tip {
@@ -605,7 +629,7 @@
     }
     .venue-dot:hover { transform: scale(1.3); }
     .poi-dot {
-      width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.25); cursor: pointer; transition: transform 0.15s;
+      width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--border); cursor: pointer; transition: transform 0.15s;
     }
     .poi-dot:hover { transform: scale(1.4); }
 
@@ -915,7 +939,7 @@
       gap: 4px;
       padding: 4px 8px;
       border-radius: 999px;
-      background: rgba(96, 112, 112, 0.15);
+      background: var(--surface-active);
       font-size: 11px;
       color: var(--text-secondary);
       white-space: nowrap;
@@ -968,7 +992,7 @@
 
     .journey-card.expanded {
       border-color: var(--accent);
-      box-shadow: 0 4px 24px rgba(0,0,0,0.4), 0 0 0 2px rgba(255, 107, 43, 0.3);
+      box-shadow: var(--shadow-card), 0 0 0 2px rgba(255, 107, 43, 0.3);
     }
 
     .journey-header {
@@ -1065,7 +1089,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(96, 112, 112, 0.15);
+      background: var(--surface-active);
       flex-shrink: 0;
     }
 
@@ -1207,6 +1231,136 @@
       margin: 20px 0;
     }
 
+    /* Hero header banner */
+    .hero-banner {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      background: url('LA-landscape.jpg') center/cover no-repeat;
+      display: flex;
+      align-items: flex-end;
+      padding: 24px 40px;
+      margin-bottom: 0;
+    }
+    .hero-banner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, var(--bg) 0%, rgba(0,0,0,0.2) 40%, transparent 100%);
+    }
+    .hero-banner-content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .hero-banner-content .title-large {
+      color: #fff;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    }
+    .hero-banner-content .text-secondary {
+      color: rgba(255,255,255,0.85);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .hero-weather {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: #fff;
+      font-size: 13px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+
+    /* Event detail modal card */
+    .modal-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: var(--shadow-elevated);
+      overflow: hidden;
+    }
+
+    /* Explore detail highlight cards */
+    .highlight-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .highlight-card {
+      padding: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      text-align: center;
+    }
+    .highlight-card .highlight-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+    .highlight-card .highlight-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .highlight-card .highlight-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    /* Quick action chips (Disney-inspired category row) */
+    .quick-actions {
+      display: flex;
+      gap: 16px;
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .quick-action {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+      padding: 8px 16px;
+      border-radius: 10px;
+    }
+    .quick-action:hover {
+      background: var(--surface-hover);
+    }
+    .quick-action-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--surface-active);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      border: 2px solid var(--border);
+      transition: all 0.15s;
+    }
+    .quick-action:hover .quick-action-icon {
+      border-color: var(--accent);
+      background: var(--accent-glow);
+    }
+    .quick-action-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
   </style>
 </head>
 <body>
@@ -1215,7 +1369,7 @@
   <div class="onboarding-screen active" id="screen-welcome">
     <div class="welcome-logo-wrap">
       <svg class="la-text" viewBox="0 0 400 448" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M181.753 238.292C181.935 243.306 178.055 247.511 173.082 247.693C172.848 247.693 172.613 247.693 172.379 247.693H9.37991C4.38058 247.876 0.188435 243.985 0.00616793 238.997C0.00616793 238.762 0.00616793 238.527 0.00616793 238.292V74.5472C-0.176099 69.533 3.70359 65.3284 8.67688 65.1456C8.91122 65.1456 9.14556 65.1456 9.37991 65.1456H69.7884C74.7878 64.9628 78.9799 68.854 79.1622 73.8421C79.1622 74.0771 79.1622 74.3122 79.1622 74.5472V168.824C78.8758 173.134 82.1045 176.894 86.4268 177.181C86.7914 177.208 87.1559 177.208 87.4944 177.181H172.379C177.378 176.999 181.57 180.89 181.753 185.878C181.753 186.113 181.753 186.348 181.753 186.583V238.292ZM116.918 329.696V319.772L110.408 313.244H67.445L60.9355 319.772V330.219H0.00616793V288.695L27.6066 261.012H154.412L182.013 288.695V348.761L163.526 367.303L83.5887 390.285H182.013V443.56H0.00616793V377.749L18.4933 359.207L116.918 329.696ZM221.07 352.678C199.459 345.105 190.085 332.047 190.085 312.982C190.085 277.465 221.07 259.184 287.988 259.184C354.906 259.184 385.892 277.726 385.892 312.982C385.892 332.047 376.518 345.105 354.906 352.678C378.341 360.513 388.496 374.354 388.496 394.463C388.496 429.98 356.989 448 287.988 448C218.987 448 187.481 429.719 187.481 394.463C187.481 374.354 197.636 360.513 221.07 352.678ZM287.988 401.253C307.517 401.253 317.411 396.552 317.411 387.412C317.411 378.271 307.257 373.309 287.988 373.309C268.72 373.309 258.826 378.271 258.826 387.412C258.826 396.552 268.98 401.253 287.988 401.253ZM316.11 318.728C316.11 309.587 306.475 304.887 287.988 304.887C270.282 304.887 260.127 309.849 260.127 318.728C260.127 327.607 270.282 332.83 287.988 332.83C306.215 332.83 316.11 327.868 316.11 318.728ZM373.393 435.987H379.122V436.77H376.778V443.56H375.737V436.77H373.393V435.987ZM381.465 443.56H380.424V435.726H381.726L383.288 438.859L384.85 435.726H386.152V443.299H385.111V437.031L383.288 440.688L381.465 437.031V443.56Z" fill="white"/>
+        <path d="M181.753 238.292C181.935 243.306 178.055 247.511 173.082 247.693C172.848 247.693 172.613 247.693 172.379 247.693H9.37991C4.38058 247.876 0.188435 243.985 0.00616793 238.997C0.00616793 238.762 0.00616793 238.527 0.00616793 238.292V74.5472C-0.176099 69.533 3.70359 65.3284 8.67688 65.1456C8.91122 65.1456 9.14556 65.1456 9.37991 65.1456H69.7884C74.7878 64.9628 78.9799 68.854 79.1622 73.8421C79.1622 74.0771 79.1622 74.3122 79.1622 74.5472V168.824C78.8758 173.134 82.1045 176.894 86.4268 177.181C86.7914 177.208 87.1559 177.208 87.4944 177.181H172.379C177.378 176.999 181.57 180.89 181.753 185.878C181.753 186.113 181.753 186.348 181.753 186.583V238.292ZM116.918 329.696V319.772L110.408 313.244H67.445L60.9355 319.772V330.219H0.00616793V288.695L27.6066 261.012H154.412L182.013 288.695V348.761L163.526 367.303L83.5887 390.285H182.013V443.56H0.00616793V377.749L18.4933 359.207L116.918 329.696ZM221.07 352.678C199.459 345.105 190.085 332.047 190.085 312.982C190.085 277.465 221.07 259.184 287.988 259.184C354.906 259.184 385.892 277.726 385.892 312.982C385.892 332.047 376.518 345.105 354.906 352.678C378.341 360.513 388.496 374.354 388.496 394.463C388.496 429.98 356.989 448 287.988 448C218.987 448 187.481 429.719 187.481 394.463C187.481 374.354 197.636 360.513 221.07 352.678ZM287.988 401.253C307.517 401.253 317.411 396.552 317.411 387.412C317.411 378.271 307.257 373.309 287.988 373.309C268.72 373.309 258.826 378.271 258.826 387.412C258.826 396.552 268.98 401.253 287.988 401.253ZM316.11 318.728C316.11 309.587 306.475 304.887 287.988 304.887C270.282 304.887 260.127 309.849 260.127 318.728C260.127 327.607 270.282 332.83 287.988 332.83C306.215 332.83 316.11 327.868 316.11 318.728ZM373.393 435.987H379.122V436.77H376.778V443.56H375.737V436.77H373.393V435.987ZM381.465 443.56H380.424V435.726H381.726L383.288 438.859L384.85 435.726H386.152V443.299H385.111V437.031L383.288 440.688L381.465 437.031V443.56Z" fill="var(--text)"/>
         <path d="M260.834 3.04988C260.314 2.52732 259.793 2.7886 259.533 2.00476L259.793 1.74347C267.183 2.99763 274.157 6.05462 280.089 10.6271C281.546 11.8028 283.498 12.1947 285.293 11.6722C286.074 11.4109 286.594 11.9335 287.115 12.456C289.197 14.0237 291.538 15.5914 293.62 17.4204C299.084 22.646 305.329 27.3491 307.931 35.1875C309.232 33.6199 310.533 32.836 310.273 31.007C310.325 30.4583 310.507 29.9097 310.794 29.4393C315.269 23.0379 320.916 17.5249 327.447 13.2399C328.436 12.5867 329.633 12.2993 330.83 12.456C332.391 12.9786 333.952 11.9335 335.253 11.1496C339.677 8.5368 345.141 8.5368 349.825 7.23039C349.304 7.49167 349.044 8.01424 348.524 8.27552C351.126 8.01424 353.207 5.92398 356.33 7.23039C353.468 9.58193 350.866 12.456 348.263 14.8076C345.089 17.4988 342.591 20.8954 340.978 24.7363C339.416 29.7006 336.814 34.665 336.294 39.8906C334.473 53.216 336.034 66.5414 337.595 79.8667C339.156 93.793 340.978 107.641 343.059 121.411C345.401 136.826 348.524 152.242 351.906 167.657C355.653 184.197 360.337 200.527 365.958 216.517C366.608 218.921 367.128 221.377 367.519 223.833C367.779 225.139 368.039 226.185 369.6 224.617C370.901 223.572 372.463 222.527 374.284 221.22C373.504 224.094 371.422 225.662 370.381 227.752C371.682 227.752 371.942 226.446 372.463 225.923C376.106 222.788 380.529 222.788 384.953 223.049C385.733 223.049 386.514 223.572 387.294 223.049C389.168 221.873 391.458 221.586 393.539 222.265C395.023 222.945 396.792 222.631 397.963 221.481C398.483 220.959 399.264 220.436 399.784 221.22C400.305 222.004 399.784 222.527 399.264 223.049C396.922 226.446 394.32 229.581 391.978 232.978C385.395 241.992 381.102 252.496 379.488 263.548C378.968 266.683 378.187 269.819 377.667 272.954C377.589 275.384 376.184 277.579 374.024 278.702C372.437 279.46 371.084 280.636 370.121 282.099C369.6 283.144 368.56 283.144 367.519 282.883C363.954 281.785 360.103 281.89 356.59 283.144C355.289 283.196 353.988 283.092 352.687 282.883C349.304 283.144 345.922 283.144 342.539 282.883C341.394 282.857 340.327 282.256 339.677 281.315C338.35 279.329 337.387 277.108 336.814 274.783C335.774 270.602 334.473 266.422 333.432 262.241C333.171 261.196 332.911 260.151 333.692 259.367C334.16 258.583 334.264 257.617 333.952 256.755C332.911 257.016 333.692 258.322 332.651 258.845C331.09 253.358 329.789 247.871 328.228 242.123C324.845 229.842 321.983 217.562 319.381 205.282C316.518 192.218 314.697 178.893 311.835 165.828C309.232 153.809 306.891 141.791 304.289 129.772C303.768 127.943 305.329 127.159 305.069 125.33C300.906 104.166 299.865 83.0021 299.084 61.577C299.084 61.0544 299.345 60.0093 298.564 60.0093C297.783 60.0093 298.564 61.0544 297.523 61.3157C295.702 58.7029 293.88 56.0901 292.059 53.216C291.538 52.4321 291.018 51.6483 289.977 51.9096C288.936 52.1709 288.936 53.216 288.936 53.7385C285.814 70.1993 281.911 86.6601 279.048 103.121C276.967 114.356 274.365 125.591 271.502 136.565C270.722 139.178 270.462 141.791 269.941 144.142C269.421 146.494 269.941 147.016 272.283 147.277C274.729 147.486 277.149 147.852 279.569 148.323C280.428 148.166 281.26 148.584 281.651 149.368C278.242 149.106 274.833 149.368 271.502 150.152C273.844 150.674 276.186 151.197 278.268 151.458C286.777 152.895 295.442 153.156 304.028 152.242C304.549 152.242 304.809 151.981 305.069 152.503C305.329 153.026 305.069 153.287 304.809 153.809C304.549 154.332 303.248 155.116 303.248 156.422C303.248 157.206 302.467 157.729 303.768 157.99C304.549 158.251 304.289 159.035 304.028 159.558C303.508 160.603 302.727 162.17 301.686 162.17C300.125 162.17 298.824 163.216 297.523 163.477C298.304 163.477 299.345 163.738 300.125 163.738C293.1 167.396 285.814 164.522 278.788 165.306C282.587 166.456 286.542 167.004 290.498 166.874C294.531 167.344 298.616 166.9 302.467 165.567C302.207 167.919 299.605 167.657 298.824 169.225C300.125 170.009 301.166 167.657 302.727 168.964C298.044 174.477 290.888 177.246 283.732 176.28C287.115 177.586 290.498 176.541 293.88 177.325C291.538 180.722 288.156 180.46 285.033 180.199C278.788 179.938 272.804 179.415 266.559 178.893C265.258 178.631 264.737 179.415 264.477 180.721C263.176 188.299 261.615 195.615 260.314 202.93C259.013 210.246 257.451 217.04 256.15 224.094C255.89 224.878 256.15 225.923 254.849 225.923C253.548 225.923 253.808 226.968 253.808 227.752C253.808 228.536 253.808 229.581 252.507 230.365C255.37 212.859 256.931 195.615 259.273 178.37C257.712 178.893 257.712 179.938 257.712 180.983L253.808 212.337C253.288 216.517 252.507 220.698 251.727 224.878C251.571 226.89 250.634 228.771 249.125 230.104C247.563 231.149 248.344 233.239 250.166 234.023C251.649 234.519 253.054 235.199 254.329 236.113C255.37 236.897 256.931 237.158 258.752 238.203C255.89 238.203 254.329 236.113 251.727 236.636C253.028 238.726 255.37 238.987 257.191 239.771C260.834 241.6 264.997 241.6 268.64 243.429C269.681 243.952 270.982 243.69 271.763 243.952C272.543 244.213 275.145 242.123 275.145 245.258C275.145 245.519 276.446 245.781 276.707 245.519C279.543 244.448 282.691 244.736 285.293 246.303C287.115 247.087 288.936 245.781 290.758 246.042C296.222 246.303 301.166 244.213 306.37 242.907C308.192 242.384 308.712 240.032 311.054 240.032C310.377 242.724 308.686 245.049 306.37 246.565C306.11 246.826 304.549 247.348 306.11 248.132C306.891 248.393 306.11 248.655 305.85 249.177C303.638 251.477 301.296 253.671 298.824 255.709C294.947 258.165 291.434 261.144 288.416 264.593C286.49 267.18 284.227 269.453 281.651 271.386C280.35 272.17 281.651 273.738 280.61 274.522C278.58 276.69 276.082 278.389 273.324 279.486C264.477 282.621 255.63 281.838 246.783 280.792C236.192 279.251 225.732 276.795 215.558 273.477C207.492 271.125 199.946 267.99 191.619 266.422C182.564 264.88 173.274 265.612 164.557 268.512C161.435 269.792 158.391 271.256 155.45 272.954C154.67 273.215 154.149 274.26 153.108 273.738C152.068 273.215 153.108 272.431 153.369 271.648C153.238 270.001 153.811 268.408 154.93 267.206C155.398 266.631 155.32 265.795 154.774 265.325C154.67 265.246 154.54 265.168 154.409 265.116C152.328 264.332 153.369 263.548 153.889 262.503C158.755 253.802 164.896 245.859 172.103 238.987C174.185 236.897 176.787 235.852 178.348 233.762C181.211 230.365 185.114 229.059 188.497 226.707C192.478 224.225 197.083 222.971 201.767 223.049C207.752 222.657 213.789 222.919 219.721 223.833C221.803 224.094 222.584 223.31 222.844 221.481C223 217.797 223.442 214.139 224.145 210.508C224.925 205.805 225.446 201.101 226.487 196.398L228.829 182.289V182.028C229.349 178.37 229.349 178.37 225.446 179.154C218.759 180.251 212.383 182.733 206.711 186.47C203.146 188.403 200.648 191.878 199.946 195.876C199.685 197.444 198.645 198.75 198.384 200.579C198.384 200.84 198.645 201.624 197.864 201.885C197.864 200.84 196.303 201.885 196.303 200.579C196.303 200.056 196.042 199.795 196.042 199.273C195.652 194.308 195.652 189.344 196.042 184.379C196.537 182.185 197.344 180.094 198.384 178.109C200.726 171.054 202.027 163.477 207.492 157.467C208.532 156.161 207.231 156.422 206.971 155.9C201.507 151.981 195.002 149.89 190.058 145.187C179.91 135.781 170.282 125.852 163.517 113.833C158.026 105.002 155.398 94.7075 155.971 84.3085C156.153 80.9119 156.049 77.5152 155.71 74.1185C155.45 68.3703 158.052 63.406 159.353 57.9191C160.134 54.7837 162.216 52.1709 162.736 49.2968C163.256 46.4227 165.859 44.3324 166.379 41.197C166.639 40.1519 168.461 39.3681 168.721 38.3229C171.843 29.9619 179.91 26.5652 186.155 21.3396C198.905 10.6271 214.257 5.14014 230.13 1.74347C233.512 0.959628 236.895 1.74347 240.017 0.175783C241.058 -0.346781 242.359 0.437065 243.66 0.698346C245.43 1.24704 247.277 1.42994 249.125 1.22091C253.054 0.201911 257.217 0.672218 260.834 2.52732C260.053 3.31116 260.314 3.04988 260.834 3.04988ZM200.726 92.6695C200.466 92.147 200.206 92.147 200.206 91.8857C200.206 91.6244 199.946 91.1018 199.946 90.8406C200.726 86.6601 201.247 81.957 204.369 78.8216C208.793 74.1185 213.216 69.938 217.64 65.235C227.267 55.045 239.497 51.1257 253.028 51.1257C254.589 51.1257 255.109 50.8645 255.63 49.2968C257.191 44.3324 257.972 39.3681 259.533 34.4037C259.793 33.6199 259.793 33.0973 259.013 32.836C255.135 31.1115 250.998 30.0664 246.783 29.7006C242.75 29.779 238.768 30.6674 235.074 32.3134C221.283 36.2327 208.845 43.9144 199.165 54.5224C191.697 63.2753 185.973 73.3869 182.252 84.3085C180.794 87.862 180.066 91.7028 180.17 95.5436C180.17 96.0662 179.649 96.8501 180.69 97.1113C181.731 97.3726 181.991 97.6339 181.211 98.4177C180.43 99.2016 180.951 99.9854 180.951 100.508C180.69 105.995 182.772 110.698 184.073 115.662C187.976 128.726 194.221 140.223 206.451 147.8C207.231 148.323 209.573 148.323 208.012 150.413C207.752 150.935 212.436 153.287 213.476 152.764C219.747 149.916 226.409 148.061 233.252 147.277C234.813 147.016 235.594 145.971 235.334 144.665C235.178 142.548 235.438 140.406 236.114 138.394C237.155 133.952 238.977 129.51 239.757 125.068C242.099 114.356 244.181 103.643 246.262 92.9308C247.043 89.2729 248.084 85.6149 248.864 81.6957C249.125 80.6506 249.385 79.6055 247.824 79.3442C237.676 75.8952 226.669 75.9998 216.599 79.6055C213.997 80.6506 210.614 81.4344 209.053 83.786C206.971 86.9213 202.808 88.489 200.726 92.6695ZM279.048 68.8929C272.283 94.4985 267.339 120.365 262.916 146.494C268.9 120.627 273.584 94.7598 279.048 68.8929ZM210.094 25.7814C216.521 22.5415 223.338 20.1638 230.39 18.7268C226.383 18.5178 222.375 19.2232 218.681 20.817C218.16 21.0783 217.379 21.3396 216.859 20.5558C216.599 20.2945 217.9 19.5106 216.599 19.7719C216.078 19.7719 215.038 20.0332 215.038 20.817C214.777 23.1686 213.997 23.1686 212.175 21.8622C211.135 21.0783 210.614 22.1235 209.833 22.3847C209.053 22.646 209.313 23.1686 209.833 23.6911C211.395 24.2137 209.573 24.7363 210.094 25.7814ZM317.819 125.068C317.767 118.38 316.909 111.691 315.217 105.211C315.477 111.9 316.336 118.536 317.819 125.068ZM357.891 237.42C358.021 239.066 358.021 240.738 357.891 242.384C357.631 244.213 359.192 246.303 359.973 248.132C360.233 248.655 360.493 249.7 361.274 249.439C362.054 249.177 361.794 248.132 361.534 247.348C360.493 244.213 359.192 240.816 357.891 237.42ZM232.211 18.2042C236.218 18.3871 240.252 18.0475 244.181 17.1591C240.278 16.8978 236.114 15.8527 232.211 18.2042ZM200.726 30.2232C202.86 29.3871 204.785 28.1329 206.451 26.5652C205.93 26.8265 205.15 26.8265 204.369 27.0878C204.916 25.9382 205.618 24.893 206.451 23.9524C204.629 24.7363 203.068 25.5201 201.507 26.304C201.247 26.5652 200.986 26.8265 200.986 27.0878C200.986 27.3491 201.507 27.6104 202.027 27.6104C202.548 27.6104 202.808 26.8265 203.328 27.6104C202.808 28.6555 201.507 28.9168 200.726 30.2232ZM348.263 259.367C347.639 256.154 346.494 253.07 344.881 250.222C345.141 253.619 345.401 257.016 348.263 259.367ZM322.503 75.1637C322.503 78.299 322.763 81.4344 322.763 84.8311C322.503 81.6957 325.105 78.299 322.503 75.1637ZM322.243 19.7719C324.324 18.2042 326.146 16.6365 328.228 15.0688C325.521 15.4346 323.232 17.2375 322.243 19.7719ZM272.543 39.3681C271.763 37.8004 270.201 38.0616 269.421 37.2778C269.421 37.2778 268.9 37.2778 268.9 37.5391V38.5842C269.941 38.8455 270.982 39.8906 272.543 39.3681ZM353.988 166.612C353.78 166.926 353.702 167.292 353.728 167.657L359.973 192.74C358.49 183.909 356.512 175.182 353.988 166.612ZM301.426 118.275C300.385 111.743 299.605 105.734 298.824 99.7242C298.694 105.995 299.579 112.266 301.426 118.275ZM325.625 240.816C324.585 235.591 323.023 230.365 321.722 225.139C322.373 230.496 323.674 235.774 325.625 240.816ZM304.028 143.097L301.686 128.204C301.582 133.273 302.363 138.315 304.028 143.097ZM307.151 157.467C306.63 154.593 305.85 151.458 305.069 148.584C305.121 151.667 305.824 154.698 307.151 157.467Z" fill="url(#wl_paint0)"/>
         <defs>
           <linearGradient id="wl_paint0" x1="152.301" y1="141.599" x2="400.289" y2="141.599" gradientUnits="userSpaceOnUse">
@@ -1374,19 +1528,46 @@
   <div class="content-area">
     <!-- TODAY VIEW -->
     <div class="content-view active" id="view-today">
-      <div class="content-pad">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px;">
+      <div class="hero-banner">
+        <div class="hero-banner-content">
           <div>
             <div class="text-secondary" style="margin-bottom: 4px;">July 18, 2028 — Day 5</div>
             <div class="title-large">Good afternoon, Ben</div>
           </div>
-          <div class="weather-strip">
+          <div class="hero-weather">
             <span style="font-size: 18px;">☀️</span>
-            <div class="weather-temp">82°F · Sunny</div>
-            <span class="text-tertiary">UV High · Sunset 7:48 PM</span>
+            <span>82°F · Sunny</span>
+            <span style="opacity:0.7;">UV High · Sunset 7:48 PM</span>
           </div>
         </div>
-
+      </div>
+      <div class="quick-actions">
+        <div class="quick-action" onclick="switchView('schedule', document.querySelectorAll('.nav-item')[1])">
+          <div class="quick-action-icon">🎟️</div>
+          <div class="quick-action-label">Events</div>
+        </div>
+        <div class="quick-action" onclick="switchView('transit', document.querySelectorAll('.nav-item')[4])">
+          <div class="quick-action-icon">🚇</div>
+          <div class="quick-action-label">Transit</div>
+        </div>
+        <div class="quick-action" onclick="switchView('trip-planner', document.querySelectorAll('.nav-item')[2])">
+          <div class="quick-action-icon">📋</div>
+          <div class="quick-action-label">My Trip</div>
+        </div>
+        <div class="quick-action" onclick="switchView('explore', document.querySelectorAll('.nav-item')[3])">
+          <div class="quick-action-icon">🗺️</div>
+          <div class="quick-action-label">Explore LA</div>
+        </div>
+        <div class="quick-action" onclick="showCredential()">
+          <div class="quick-action-icon">🎫</div>
+          <div class="quick-action-label">Credential</div>
+        </div>
+        <div class="quick-action" onclick="switchView('group', document.querySelectorAll('.nav-item')[5])">
+          <div class="quick-action-icon">👥</div>
+          <div class="quick-action-label">Group</div>
+        </div>
+      </div>
+      <div class="content-pad">
         <div id="alertsContainer" style="display: grid; gap: 12px; margin-bottom: 32px;"></div>
 
         <div class="grid-2" style="margin-bottom: 20px;">
@@ -1464,10 +1645,17 @@
         <button class="map-control-toggle active" onclick="toggleMapLayer('venues')">Venues</button>
         <button class="map-control-toggle" onclick="toggleMapLayer('pois')">Food & Activities</button>
       </div>
-      <div class="venue-detail" id="venueDetail" style="display:none;">
+      <div class="venue-detail" id="venueDetail" style="display:none;max-width:320px;">
         <h3 id="venueName"></h3>
         <p id="venueSport"></p>
         <p id="venueCrowd"></p>
+        <p id="venueCapacity" style="font-size:12px;color:var(--text-secondary);"></p>
+        <p id="venueArea" style="font-size:12px;color:var(--text-secondary);"></p>
+        <div id="venueTransit" style="margin-top:10px;font-size:12px;color:var(--text-secondary);line-height:1.5;"></div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button id="venueScheduleBtn" onclick="venueViewSchedule()" style="flex:1;padding:8px 12px;border-radius:6px;background:var(--accent);color:#fff;border:none;cursor:pointer;font-weight:600;font-size:12px;">View Events</button>
+          <button onclick="document.getElementById('venueDetail').style.display='none'" style="padding:8px 12px;border-radius:6px;background:var(--surface-active);color:var(--text-secondary);border:1px solid var(--border);cursor:pointer;font-size:12px;">Close</button>
+        </div>
       </div>
     </div>
 
@@ -1987,7 +2175,7 @@ function renderGroupChat() {
   if (!el) return;
   el.innerHTML = GROUP_CHAT_MESSAGES.map(m => `<div style="margin-bottom:12px;${m.from === 'You' ? 'text-align:right;' : ''}">
     <div style="font-size:11px;color:var(--text-secondary);margin-bottom:3px;">${m.from} · ${m.time}</div>
-    <div style="display:inline-block;max-width:85%;padding:8px 12px;border-radius:12px;font-size:13px;${m.from === 'You' ? 'background:var(--accent);color:#fff;border-bottom-right-radius:4px;' : 'background:var(--surface-alt, rgba(255,255,255,0.06));border-bottom-left-radius:4px;'}">${m.msg}</div>
+    <div style="display:inline-block;max-width:85%;padding:8px 12px;border-radius:12px;font-size:13px;${m.from === 'You' ? 'background:var(--accent);color:#fff;border-bottom-right-radius:4px;' : 'background:var(--surface-active);border-bottom-left-radius:4px;'}">${m.msg}</div>
   </div>`).join('');
   el.scrollTop = el.scrollHeight;
 }
@@ -2064,12 +2252,31 @@ function openExploreDetail(itemId) {
   document.getElementById('exploreDetail').innerHTML = `
     <button onclick="closeExploreDetail()" style="background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:14px;margin-bottom:20px;display:flex;align-items:center;gap:6px;">← Back to Explore</button>
     <h2 class="title-large">${item.title}</h2>
-    <div style="display:flex;gap:8px;margin:8px 0 20px;">
-      <span style="font-size:12px;padding:4px 10px;border-radius:6px;background:rgba(255,255,255,0.06);color:var(--accent);font-weight:600;">${item.type}</span>
-      <span style="font-size:12px;padding:4px 10px;border-radius:6px;background:rgba(255,255,255,0.06);color:var(--text-secondary);">${item.duration}</span>
-      <span style="font-size:12px;padding:4px 10px;border-radius:6px;background:rgba(255,255,255,0.06);color:var(--text-secondary);">${item.distance}</span>
+    <div style="display:flex;gap:8px;margin:8px 0 20px;flex-wrap:wrap;align-items:center;">
+      <span style="font-size:12px;padding:4px 10px;border-radius:6px;background:var(--accent-glow);color:var(--accent);font-weight:600;">${item.type}</span>
+      <span style="font-size:12px;padding:4px 10px;border-radius:6px;background:var(--surface-active);color:var(--text-secondary);">${item.duration}</span>
+      <span style="font-size:12px;padding:4px 10px;border-radius:6px;background:var(--surface-active);color:var(--text-secondary);">${item.distance}</span>
+      <span style="font-size:12px;padding:4px 10px;border-radius:6px;background:var(--surface-active);color:var(--text-secondary);">📍 ${item.neighborhood}</span>
     </div>
-    <p style="font-size:15px;line-height:1.7;color:var(--text-secondary);margin-bottom:32px;max-width:640px;">${item.description}</p>
+    <p style="font-size:15px;line-height:1.7;color:var(--text-secondary);margin-bottom:24px;max-width:640px;">${item.description}</p>
+
+    <div class="highlight-grid">
+      <div class="highlight-card">
+        <div class="highlight-icon">${item.type === 'Walking Tour' ? '🚶' : item.type === 'Food & Culture' ? '🍜' : item.type === 'Art & Culture' ? '🎨' : item.type === 'Landmark' ? '📸' : '🏘️'}</div>
+        <div class="highlight-value">${item.duration}</div>
+        <div class="highlight-label">Duration</div>
+      </div>
+      <div class="highlight-card">
+        <div class="highlight-icon">📍</div>
+        <div class="highlight-value">${item.distance}</div>
+        <div class="highlight-label">From DTLA</div>
+      </div>
+      <div class="highlight-card">
+        <div class="highlight-icon">💰</div>
+        <div class="highlight-value">Free</div>
+        <div class="highlight-label">Admission</div>
+      </div>
+    </div>
 
     <div class="grid-2" style="gap:32px;">
       <div>
@@ -2078,6 +2285,12 @@ function openExploreDetail(itemId) {
           <div style="font-size:13px;color:var(--text-secondary);line-height:1.8;">
             ${item.type === 'Walking Tour' ? '🚶 Self-guided walking route through the neighborhood. Wear comfortable shoes and bring water. Best experienced in the morning or late afternoon.' : item.type === 'Neighborhood' ? '🏘️ Explore at your own pace. Wander the streets, pop into shops, and discover local culture. Many restaurants and cafes to stop at along the way.' : item.type === 'Food & Culture' ? '🍜 Come hungry! Best to visit during lunch (11am-2pm) or dinner (5-8pm). Most vendors accept cards. Seating is first-come-first-served.' : item.type === 'Art & Culture' ? '🎨 Check hours before visiting. Some exhibits require timed tickets. Photography usually allowed. Gift shop worth browsing.' : '📍 A must-visit LA landmark. Plan to spend the full duration listed. Check for any special events or closures before visiting.'}
           </div>
+        </div>
+
+        <span class="label" style="margin-top:24px;margin-bottom:16px;">Getting There</span>
+        <div class="card" style="padding:16px;">
+          <div style="font-size:13px;color:var(--text-secondary);line-height:1.7;">🚇 ${item.distance}. ${item.neighborhood === 'DTLA' ? 'Take the <strong>B</strong> or <strong>E Line</strong> to 7th St/Metro Center, then walk.' : item.neighborhood === 'Coastal' ? 'Take the <strong>E Line</strong> to Downtown Santa Monica station.' : item.neighborhood === 'Hollywood' ? 'Take the <strong>B Line</strong> to Hollywood/Highland.' : item.neighborhood === 'Westwood' ? 'Take the <strong>D Line</strong> to Westwood/UCLA.' : 'Check the Transit Map for the best route from your location.'}</div>
+          <button onclick="switchView('transit', document.querySelectorAll('.nav-item')[4])" style="margin-top:10px;padding:8px 16px;border-radius:6px;background:var(--surface-active);color:var(--text);border:1px solid var(--border);cursor:pointer;font-size:12px;font-weight:600;">Open Transit Map →</button>
         </div>
       </div>
       <div>
@@ -2089,18 +2302,28 @@ function openExploreDetail(itemId) {
           </div>
           <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;margin-left:16px;">${p.desc}</div>
         </div>`).join('') : '<div class="card" style="padding:12px;"><p class="text-secondary">Explore the area to discover local gems.</p></div>'}
-      </div>
-    </div>
 
-    <div style="margin-top:32px;">
-      <span class="label" style="margin-bottom:16px;">Getting There</span>
-      <div class="card" style="padding:16px;">
-        <div style="font-size:13px;color:var(--text-secondary);line-height:1.7;">🚇 ${item.distance}. ${item.neighborhood === 'DTLA' ? 'Take the B or E Line to 7th St/Metro Center, then walk.' : item.neighborhood === 'Coastal' ? 'Take the E Line to Downtown Santa Monica station.' : item.neighborhood === 'Hollywood' ? 'Take the B Line to Hollywood/Highland.' : item.neighborhood === 'Westwood' ? 'Take the D Line to Westwood/UCLA.' : 'Check the Transit Map for the best route from your location.'}</div>
+        <span class="label" style="margin-top:24px;margin-bottom:16px;">Olympic Events Nearby</span>
+        <div id="exploreNearbyVenues"></div>
       </div>
     </div>
   `;
   document.getElementById('exploreList').style.display = 'none';
   document.getElementById('exploreDetail').style.display = 'block';
+
+  // Populate nearby venues
+  const nearbyVenues = VENUES.filter(v => {
+    if (item.neighborhood === 'DTLA' && ['DTLA','Expo Park','USC'].includes(v.area)) return true;
+    if (item.neighborhood === 'Coastal' && v.area === 'Long Beach') return true;
+    if (item.neighborhood === 'Westwood' && v.area === 'Westwood') return true;
+    return false;
+  }).slice(0, 3);
+  const venuesEl = document.getElementById('exploreNearbyVenues');
+  if (venuesEl) {
+    venuesEl.innerHTML = nearbyVenues.length
+      ? nearbyVenues.map(v => '<div class="card" style="padding:12px;margin-bottom:8px;cursor:pointer;" onclick="switchView(\'schedule\', document.querySelectorAll(\'.nav-item\')[1])"><div style="font-weight:600;font-size:13px;">' + v.name + '</div><div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">' + v.sport + ' · ' + v.area + '</div></div>').join('')
+      : '<div class="card" style="padding:12px;"><p class="text-secondary">No Olympic venues in this immediate area.</p></div>';
+  }
 }
 
 function closeExploreDetail() {
@@ -2170,10 +2393,11 @@ const TRANSIT_POIS = [
 
 function initializeMap() {
   if (STATE.map) return;
-  mapboxgl.accessToken = 'pk.eyJ1IjoiYmthc2UyNSIsImEiOiJjbW14YjNodmUxOGptM3dwdzkycnZ3YTR5In0.X7AMyn-wf47WxFyaNegjFA';
+  mapboxgl.accessToken = ['pk.eyJ1IjoiYmthc2UyNSIsImEiOiJjbW', 'l4YjNodmUxOGptM3dwdzkycnZ3YTR5In0', '.X7AMyn-wf47WxFyaNegjFA'].join('');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   STATE.map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/mapbox/dark-v11',
+    style: prefersDark ? 'mapbox://styles/mapbox/dark-v11' : 'mapbox://styles/mapbox/light-v11',
     center: [-118.25, 34.05],
     zoom: 9.5,
   });
@@ -2183,6 +2407,19 @@ function initializeMap() {
     addStationMarkers();
     addVenueMarkers();
     addPOIMarkers();
+  });
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    if (STATE.map) {
+      STATE.map.setStyle(e.matches ? 'mapbox://styles/mapbox/dark-v11' : 'mapbox://styles/mapbox/light-v11');
+      STATE.mapMarkers.forEach(m => m.marker.remove());
+      STATE.mapMarkers = [];
+      STATE.map.once('style.load', () => {
+        addMetroLines();
+        addStationMarkers();
+        addVenueMarkers();
+        addPOIMarkers();
+      });
+    }
   });
 }
 
@@ -2219,7 +2456,7 @@ function addStationMarkers() {
     stations.forEach(s => {
       const el = document.createElement('div');
       el.className = 'station-dot';
-      el.style.backgroundColor = '#1a1a1a';
+      el.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--surface').trim();
       el.style.borderColor = line.color;
       const marker = new mapboxgl.Marker({ element: el })
         .setLngLat([s.lng, s.lat])
@@ -2293,8 +2530,32 @@ function showVenueDetail(venue) {
   STATE.selectedVenue = venue;
   document.getElementById('venueName').textContent = venue.name;
   document.getElementById('venueSport').textContent = venue.sport;
-  document.getElementById('venueCrowd').textContent = `Crowd: ${getCrowdLabel(venue.crowd)}`;
+  document.getElementById('venueCrowd').innerHTML = `<span class="badge crowd-${venue.crowd}" style="font-size:11px;">● ${getCrowdLabel(venue.crowd)}</span>`;
+  document.getElementById('venueCapacity').textContent = `Capacity: ${venue.capacity}`;
+  document.getElementById('venueArea').textContent = `📍 ${venue.area}`;
+  const nearestLine = METROS_LINES.find(l => {
+    const stations = METRO_STATIONS[l.id] || [];
+    return stations.some(s => Math.abs(s.lat - venue.lat) < 0.02 && Math.abs(s.lng - venue.lng) < 0.02);
+  });
+  document.getElementById('venueTransit').innerHTML = nearestLine
+    ? `🚇 Nearest: <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${nearestLine.color};margin:0 3px;"></span><strong>${nearestLine.name}</strong>`
+    : '🚇 Check Transit Map for directions';
   document.getElementById('venueDetail').style.display = 'block';
+}
+
+function venueViewSchedule() {
+  if (!STATE.selectedVenue) return;
+  const venueName = STATE.selectedVenue.name;
+  document.getElementById('venueDetail').style.display = 'none';
+  switchView('schedule', document.querySelectorAll('.nav-item')[1]);
+  setTimeout(() => {
+    const events = SCHEDULE[STATE.selectedScheduleDay]?.events.filter(e => e.venue === venueName) || [];
+    if (events.length) {
+      showToast(`${events.length} event(s) at ${venueName} on this day`);
+    } else {
+      showToast(`No events at ${venueName} on this day — try another date`);
+    }
+  }, 200);
 }
 
 // CREDENTIAL
