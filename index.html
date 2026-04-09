@@ -357,6 +357,10 @@
       display: flex;
     }
 
+    .onboarding-container {
+      overflow-y: auto;
+    }
+
     .onboarding-screen {
       display: none;
       text-align: center;
@@ -2095,10 +2099,10 @@
     <button class="btn-primary" onclick="nextOnboardingScreen()">Continue</button>
   </div>
 
-  <div class="onboarding-screen" id="screen-interests">
+  <div class="onboarding-screen" id="screen-interests" style="max-width:720px;">
     <h1 class="onboarding-h1">What sports interest you?</h1>
     <p class="onboarding-subtitle">Pick your favorites and we will personalize your experience.</p>
-    <div id="interestGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;"></div>
+    <div id="interestGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px;max-height:50vh;overflow-y:auto;padding:4px;"></div>
     <p id="interestCount" style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;">0 selected (pick at least 3)</p>
     <button id="interestContinueBtn" class="btn-primary btn-disabled" disabled onclick="nextOnboardingScreen()">Continue</button>
     <div style="margin-top:16px;"><a href="javascript:void(0)" class="cta-link" onclick="skipInterestSelection()">Skip for now</a></div>
