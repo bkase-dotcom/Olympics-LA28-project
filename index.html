@@ -128,6 +128,28 @@
         --sidebar-border: rgba(255,255,255,0.07);
         --sidebar-hover: rgba(255,255,255,0.05);
       }
+
+      .calendar-day.selected {
+        background: #fff;
+        color: #000;
+        border-color: #fff;
+      }
+
+      .form-group input:focus,
+      .form-group textarea:focus,
+      .form-group select:focus,
+      .text-input:focus {
+        border-bottom-color: var(--text);
+      }
+
+      .btn-primary {
+        background: var(--text);
+        color: var(--bg);
+      }
+
+      .btn-primary:hover {
+        background: #d0d0d5;
+      }
     }
 
     /* ========================================================
@@ -151,8 +173,8 @@
       background: var(--bg);
       color: var(--text);
       font-family: var(--font-body);
-      font-size: 14px;
-      line-height: 1.5;
+      font-size: 15px;
+      line-height: 1.6;
     }
 
     h1, h2, h3, h4, h5, h6 {
@@ -169,6 +191,12 @@
     a {
       color: var(--accent);
       text-decoration: none;
+    }
+
+    /* --- Focus-visible for keyboard accessibility --- */
+    :focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 2px;
     }
 
     img, svg {
@@ -188,6 +216,8 @@
       display: flex;
       width: 100%;
       height: 100%;
+      flex: 1;
+      min-height: 0;
     }
 
     .content-area {
@@ -258,8 +288,10 @@
       margin: 2px 12px;
       border-radius: 0;
       cursor: pointer;
-      font-family: var(--font-body);
-      font-size: 13px;
+      font-family: var(--font-bold);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
       color: var(--sidebar-text-secondary);
       border-left: 3px solid transparent;
       transition: color 0.2s var(--ease-la28), border-color 0.2s var(--ease-la28), background 0.2s var(--ease-la28);
@@ -554,7 +586,7 @@
     .form-group textarea:focus,
     .form-group select:focus,
     .text-input:focus {
-      border-bottom-color: var(--accent);
+      border-bottom-color: var(--la28-black);
     }
 
     .form-group input::placeholder,
@@ -573,18 +605,19 @@
        ======================================================== */
     .btn-primary {
       padding: 12px 32px;
-      background: var(--accent);
+      background: var(--la28-black);
       color: white;
       border: none;
       border-radius: 8px;
       font-family: var(--font-bold);
       font-size: 14px;
+      text-transform: uppercase;
       cursor: pointer;
       transition: all 0.2s var(--ease-la28);
     }
 
     .btn-primary:hover {
-      background: var(--accent-hover);
+      background: #222;
       transform: translateY(-1px);
     }
 
@@ -595,18 +628,19 @@
     .btn-add {
       flex: 1;
       padding: 12px;
-      background: var(--accent);
+      background: var(--la28-black);
       color: white;
       border: none;
       border-radius: 8px;
       font-family: var(--font-bold);
       font-size: 14px;
+      text-transform: uppercase;
       cursor: pointer;
       transition: all 0.2s var(--ease-la28);
     }
 
     .btn-add:hover {
-      background: var(--accent-hover);
+      background: #222;
     }
 
     .btn-close {
@@ -668,15 +702,15 @@
        ======================================================== */
     .card {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
+      border: none;
+      border-radius: 8px;
       padding: 16px 20px;
       transition: all 0.2s var(--ease-la28);
-      box-shadow: var(--shadow-card);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     }
 
     .card:hover {
-      background: var(--surface-hover);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
     }
 
     .card.expandable {
@@ -684,8 +718,8 @@
     }
 
     .card.expanded {
-      border-color: var(--accent);
-      box-shadow: var(--shadow-card), 0 0 0 2px rgba(0, 158, 214, 0.25);
+      border: 1px solid var(--text);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08), 0 0 0 1px var(--text);
     }
 
     /* ========================================================
@@ -800,21 +834,21 @@
        ======================================================== */
     .journey-card {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
+      border: none;
+      border-radius: 8px;
       cursor: pointer;
       overflow: hidden;
       transition: all 0.2s var(--ease-la28);
-      box-shadow: var(--shadow-card);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     }
 
     .journey-card:hover {
-      background: var(--surface-hover);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
     }
 
     .journey-card.expanded {
-      border-color: var(--accent);
-      box-shadow: var(--shadow-card), 0 0 0 2px rgba(0, 158, 214, 0.25);
+      border: 1px solid var(--text);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08), 0 0 0 1px var(--text);
     }
 
     .journey-header {
@@ -835,11 +869,11 @@
     }
 
     .journey-sport {
-      font-family: var(--font-medium);
+      font-family: var(--font-bold);
       font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: var(--accent);
+      color: var(--text);
     }
 
     .journey-round {
@@ -901,10 +935,11 @@
       grid-template-columns: 80px 1fr 80px 100px;
       gap: 16px;
       align-items: center;
-      padding: 16px 20px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
+      padding: 20px 0;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      border-radius: 0;
       cursor: pointer;
       transition: all 0.2s var(--ease-la28);
     }
@@ -926,11 +961,11 @@
     }
 
     .event-sport {
-      font-family: var(--font-medium);
+      font-family: var(--font-bold);
       font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: var(--accent);
+      color: var(--text);
     }
 
     .event-round {
@@ -951,12 +986,12 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 4px 10px;
+      padding: 3px 8px;
       background: var(--surface-active);
       color: var(--text-secondary);
       border-radius: 999px;
       font-family: var(--font-medium);
-      font-size: 12px;
+      font-size: 11px;
     }
 
     .badge.crowd-low {
@@ -1001,7 +1036,7 @@
 
     .calendar-day {
       padding: 12px;
-      border: 2px solid var(--border);
+      border: 1px solid var(--border);
       border-radius: 8px;
       background: transparent;
       color: var(--text-secondary);
@@ -1016,9 +1051,9 @@
     }
 
     .calendar-day.selected {
-      border-color: var(--accent);
-      background: var(--accent-glow);
-      color: var(--accent);
+      border-color: #000;
+      background: #000;
+      color: #fff;
     }
 
     .calendar-day-num {
@@ -1057,9 +1092,9 @@
     }
 
     .pill.active {
-      border-color: var(--accent);
-      background: rgba(0, 158, 214, 0.10);
-      color: var(--accent);
+      border-color: var(--text);
+      background: var(--text);
+      color: var(--bg);
       font-family: var(--font-bold);
     }
 
@@ -1069,23 +1104,23 @@
     .explore-card {
       padding: 20px;
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
+      border: none;
+      border-radius: 8px;
       cursor: pointer;
       transition: all 0.2s var(--ease-la28);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     }
 
     .explore-card:hover {
-      background: var(--surface-hover);
-      border-color: var(--text);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
     }
 
     .explore-tag {
-      font-family: var(--font-medium);
+      font-family: var(--font-bold);
       font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.06em;
-      color: var(--accent);
+      color: var(--text);
       margin-bottom: 6px;
     }
 
@@ -1629,9 +1664,10 @@
     .highlight-card {
       padding: 16px;
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      border: none;
+      border-radius: 8px;
       text-align: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     }
 
     .highlight-card .highlight-icon {
@@ -1740,7 +1776,7 @@
 
     .title-large {
       font-family: var(--font-black);
-      font-size: 32px;
+      font-size: 36px;
       line-height: 1.1;
       text-transform: uppercase;
       color: var(--text);
@@ -1758,6 +1794,7 @@
     .title-small {
       font-family: var(--font-bold);
       font-size: 16px;
+      text-transform: uppercase;
       color: var(--text);
     }
 
@@ -1827,8 +1864,9 @@
     .meal-section {
       padding: 20px;
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     }
 
     .meal-label {
@@ -1940,6 +1978,85 @@
       opacity: 0.4;
       cursor: not-allowed;
       pointer-events: none;
+    }
+
+    /* ========================================================
+       TOP NOTIFICATION BAR (la28.org pink bar)
+       ======================================================== */
+    .top-bar {
+      width: 100%;
+      background: #ff018f;
+      color: #FFFFFF;
+      text-align: center;
+      padding: 10px 20px;
+      font-family: var(--font-medium);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .top-bar-dismiss {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #FFFFFF;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 4px 8px;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+
+    .top-bar-dismiss:hover {
+      opacity: 1;
+    }
+
+    /* ========================================================
+       HERO GRADIENT (la28.org diagonal stripe pattern)
+       ======================================================== */
+    .hero-gradient {
+      background: linear-gradient(135deg, #ff018f 0%, #ff470f 25%, #ff8c00 50%, #ff470f 75%, #ff018f 100%) !important;
+    }
+
+    .hero-gradient::after {
+      background: linear-gradient(to top, var(--bg) 0%, rgba(0,0,0,0.15) 40%, transparent 100%) !important;
+    }
+
+    /* ========================================================
+       BTN-OUTLINE (secondary action style)
+       ======================================================== */
+    .btn-outline {
+      padding: 12px 32px;
+      background: transparent;
+      color: var(--la28-black);
+      border: 2px solid var(--la28-black);
+      border-radius: 8px;
+      font-family: var(--font-bold);
+      font-size: 14px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s var(--ease-la28);
+    }
+
+    .btn-outline:hover {
+      background: var(--la28-black);
+      color: var(--la28-white);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .btn-outline {
+        color: var(--text);
+        border-color: var(--text);
+      }
+      .btn-outline:hover {
+        background: var(--text);
+        color: var(--bg);
+      }
     }
 
   </style>
@@ -2120,8 +2237,13 @@
 <!-- ============================================================
      3. MAIN APP
      ============================================================ -->
-<div id="app" style="display:none;width:100%;height:100%;">
-  <div class="app-container">
+<div id="app" style="display:none;width:100%;height:100%;flex-direction:column;">
+  <!-- TOP NOTIFICATION BAR -->
+  <div class="top-bar" id="topBar">
+    WELCOME TO THE LA28 EXPERIENCE PLATFORM — YOUR PERSONALIZED OLYMPIC COMPANION
+    <button class="top-bar-dismiss" onclick="document.getElementById('topBar').style.display='none'" aria-label="Dismiss notification">&times;</button>
+  </div>
+  <div class="app-container" style="flex:1;min-height:0;">
     <!-- SIDEBAR -->
     <div class="sidebar">
       <div class="sidebar-header">
