@@ -1147,7 +1147,18 @@
     /* ========================================================
        16. MAP
        ======================================================== */
+    #view-transit.content-view.active {
+      display: flex !important;
+      flex-direction: column;
+      animation: fadeIn 0.3s var(--ease-la28);
+    }
+
     #map {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       width: 100%;
       height: 100%;
       background: var(--surface);
@@ -2363,8 +2374,8 @@
       </div>
 
       <!-- TRANSIT VIEW -->
-      <div id="view-transit" class="content-view" style="position:relative;overflow:hidden;">
-        <div id="map"></div>
+      <div id="view-transit" class="content-view" style="position:relative;overflow:hidden;min-height:400px;">
+        <div id="map" style="position:absolute;inset:0;width:100%;height:100%;"></div>
         <div class="map-controls" id="mapControls">
           <button class="map-control-toggle active" onclick="toggleMapLayer('lines')">Metro Lines</button>
           <button class="map-control-toggle active" onclick="toggleMapLayer('venues')">Venues</button>
@@ -5687,36 +5698,41 @@ function closeCredential() {
 // ----- MAP -----
 var _mapInitialized = false;
 
-function initMap() {
-  // Defensive guards
+function showMap() {
+  // Called when the transit view becomes visible. Creates the map if needed,
+  // otherwise just resizes. Uses multiple resize fallbacks to handle cases
+  // where the container size is not yet measurable.
   if (typeof mapboxgl === 'undefined') {
-    console.warn('initMap: mapbox-gl script not loaded yet');
+    console.warn('[map] mapbox-gl script not loaded — retrying in 200ms');
+    setTimeout(showMap, 200);
     return;
   }
   var mapEl = document.getElementById('map');
   if (!mapEl) {
-    console.warn('initMap: #map container not in DOM');
-    return;
-  }
-  // Data sanity check
-  if (typeof METRO_LINES === 'undefined' || typeof METRO_COORDS === 'undefined' ||
-      typeof METRO_STATIONS === 'undefined' || typeof VENUES === 'undefined' ||
-      typeof TRANSIT_POIS === 'undefined') {
-    console.warn('initMap: transit data not loaded');
+    console.warn('[map] #map container missing');
     return;
   }
 
-  // If already initialized, just resize (container may have been hidden)
-  if (_mapInitialized && STATE.map) {
-    try { STATE.map.resize(); } catch (e) { console.warn('map.resize failed', e); }
+  // If the container has zero width or height, wait for the browser to lay it
+  // out (the view may have just switched from display:none to visible).
+  var rect = mapEl.getBoundingClientRect();
+  if (rect.width < 10 || rect.height < 10) {
+    console.log('[map] container not sized yet (' + rect.width + 'x' + rect.height + '), retrying');
+    requestAnimationFrame(function () { setTimeout(showMap, 50); });
     return;
   }
-  // Map exists but load has not fired yet — resize anyway
+
   if (STATE.map) {
+    // Already exists — just make sure it's sized correctly.
     try { STATE.map.resize(); } catch (e) {}
+    // Sometimes the first resize isn't enough; do one more after paint.
+    requestAnimationFrame(function () {
+      try { STATE.map.resize(); } catch (e) {}
+    });
     return;
   }
 
+  // First-time init
   var token = ['pk.eyJ1IjoiYmthc2UyNSIsImEiOiJjbW', 'l4YjNodmUxOGptM3dwdzkycnZ3YTR5In0', '.X7AMyn-wf47WxFyaNegjFA'].join('');
   mapboxgl.accessToken = token;
 
@@ -5732,25 +5748,38 @@ function initMap() {
       attributionControl: false
     });
   } catch (e) {
-    console.warn('initMap: failed to create Mapbox map', e);
+    console.error('[map] failed to create Mapbox map:', e);
     STATE.map = null;
+    mapEl.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-secondary);">Map failed to load. ' + (e && e.message ? e.message : '') + '</div>';
     return;
   }
 
-  STATE.map.addControl(new mapboxgl.NavigationControl(), 'top-left');
+  STATE.map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-left');
   STATE.mapMarkers = [];
 
-  STATE.map.on('load', function() {
+  STATE.map.on('load', function () {
     _mapInitialized = true;
-    renderMapLayers();
-    // Extra resize in case container size changed during style load
-    setTimeout(function() { if (STATE.map) STATE.map.resize(); }, 50);
+    try { renderMapLayers(); } catch (e) { console.warn('[map] renderMapLayers failed:', e); }
+    // Cascading resizes to handle late layout
+    try { STATE.map.resize(); } catch (e) {}
+    setTimeout(function () { if (STATE.map) { try { STATE.map.resize(); } catch (e) {} } }, 100);
+    setTimeout(function () { if (STATE.map) { try { STATE.map.resize(); } catch (e) {} } }, 400);
   });
 
-  STATE.map.on('error', function(e) {
-    console.warn('Mapbox error:', e && e.error ? e.error.message : e);
+  STATE.map.on('error', function (e) {
+    console.warn('[map] Mapbox error:', e && e.error ? e.error.message : e);
   });
 }
+
+// Backwards-compat alias — other code still calls initMap()
+function initMap() { showMap(); }
+
+// Resize the map on window resize (keeps tiles sharp)
+window.addEventListener('resize', function () {
+  if (STATE.map && STATE.currentView === 'transit') {
+    try { STATE.map.resize(); } catch (e) {}
+  }
+});
 
 function renderMapLayers() {
   if (!STATE.map || !_mapInitialized) return;
@@ -6032,18 +6061,11 @@ switchView = function(view) {
   var targetView = document.getElementById('view-' + view);
   if (targetView) targetView.classList.add('active');
 
-  // Transit view: lazy-init the map the first time, and resize on every return
-  // (Mapbox needs resize() after the container goes from display:none to visible,
-  // otherwise the canvas stays at 0x0 and tiles never render.)
+  // Transit view: lazy-init the map the first time, and resize on every return.
+  // showMap() handles both the init case and the resize case, and retries
+  // internally until the container is actually sized.
   if (view === 'transit') {
-    setTimeout(function() {
-      if (!STATE.map) {
-        initMap();
-      } else {
-        try { STATE.map.resize(); } catch (e) { console.warn('map.resize failed', e); }
-        // If it was init'd but load hasn't yet completed, the load handler will resize again.
-      }
-    }, 120);
+    requestAnimationFrame(function () { setTimeout(showMap, 50); });
   }
 };
 
