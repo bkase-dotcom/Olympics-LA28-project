@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LA28 Olympics Experience Platform</title>
+  <title>LA28 Routes</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link href="https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.css" rel="stylesheet">
   <style>
     /* ========================================================
@@ -986,13 +987,22 @@
     .badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 3px 8px;
+      gap: 5px;
+      padding: 4px 10px;
       background: var(--surface-active);
       color: var(--text-secondary);
       border-radius: 999px;
       font-family: var(--font-medium);
       font-size: 11px;
+      white-space: nowrap;
+      line-height: 1;
+      width: fit-content;
+      justify-self: start;
+    }
+
+    .badge svg {
+      flex-shrink: 0;
+      display: block;
     }
 
     .badge.crowd-low {
@@ -1267,6 +1277,123 @@
       background: var(--accent-glow);
       border-color: var(--accent);
       color: var(--accent);
+    }
+
+    .map-control-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 2px 0;
+    }
+
+    .map-control-label {
+      font-family: var(--font-bold);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-secondary);
+    }
+
+    .map-day-filter {
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 12px;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.2s var(--ease-la28);
+    }
+
+    .map-day-filter:hover,
+    .map-day-filter:focus {
+      border-color: var(--accent);
+    }
+
+    /* --- Map Legend (bottom-right) --- */
+    .map-legend {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      z-index: 10;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      box-shadow: var(--shadow-card);
+      min-width: 180px;
+      max-width: 220px;
+    }
+
+    .map-legend-title {
+      font-family: var(--font-bold);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .map-legend-subtitle {
+      font-family: var(--font-bold);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-tertiary);
+      margin-top: 10px;
+      margin-bottom: 6px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text);
+      margin-bottom: 5px;
+      line-height: 1.2;
+    }
+
+    .legend-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .legend-ring {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 2px solid var(--text-secondary);
+      flex-shrink: 0;
+      box-sizing: border-box;
+    }
+
+    .legend-lines {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px 8px;
+    }
+
+    .legend-line {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .legend-line-swatch {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
     }
 
     .venue-detail {
@@ -2079,6 +2206,260 @@
       }
     }
 
+    /* ========================================================
+       MICROINTERACTIONS — site-wide polish layer
+       ======================================================== */
+
+    /* Honor user preference: kill all motion if they've asked for it. */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* --- Press feedback: every clickable thing scales down briefly on click --- */
+    .btn-primary,
+    .btn-add,
+    .btn-close,
+    .btn-outline,
+    .credential-btn,
+    .pill,
+    .calendar-day,
+    .interest-card,
+    .map-control-toggle,
+    .nav-item,
+    .card.expandable,
+    .explore-card,
+    .event-row {
+      will-change: transform;
+    }
+
+    .btn-primary:active,
+    .btn-add:active,
+    .btn-close:active,
+    .btn-outline:active {
+      transform: translateY(0) scale(0.97);
+      transition-duration: 60ms;
+    }
+
+    .credential-btn:active {
+      transform: translateY(0) scale(0.97);
+      transition-duration: 60ms;
+    }
+
+    .pill:active,
+    .map-control-toggle:active,
+    .calendar-day:active {
+      transform: scale(0.94);
+      transition-duration: 60ms;
+    }
+
+    .interest-card:active,
+    .card.expandable:active,
+    .explore-card:active {
+      transform: scale(0.985);
+      transition-duration: 60ms;
+    }
+
+    .nav-item:active {
+      transform: scale(0.97);
+      transition-duration: 60ms;
+    }
+
+    /* --- Hover lift: cards rise slightly toward the cursor --- */
+    .card:hover {
+      transform: translateY(-2px);
+    }
+
+    .explore-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.14);
+    }
+
+    .interest-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+    }
+
+    /* --- Hover slide: list rows nudge to indicate they're tap targets --- */
+    .event-row:hover {
+      transform: translateX(3px);
+      transition: background 0.15s var(--ease-la28), transform 0.15s var(--ease-la28);
+    }
+
+    .nav-item:hover {
+      transform: translateX(2px);
+      transition:
+        color 0.2s var(--ease-la28),
+        border-color 0.2s var(--ease-la28),
+        background 0.2s var(--ease-la28),
+        transform 0.18s var(--ease-la28);
+    }
+
+    .nav-item.active {
+      transform: translateX(0);
+    }
+
+    /* --- Calendar day: gentle hover lift --- */
+    .calendar-day:hover {
+      transform: translateY(-1px);
+    }
+
+    .calendar-day.selected {
+      transform: translateY(0);
+    }
+
+    /* --- Selection pop: brief scale bounce when something becomes "active/selected" --- */
+    .interest-card.selected {
+      animation: select-pop 0.32s var(--ease-la28);
+    }
+
+    .pill.active {
+      animation: select-pop 0.28s var(--ease-la28);
+    }
+
+    .map-control-toggle.active {
+      animation: select-pop 0.28s var(--ease-la28);
+    }
+
+    .calendar-day.selected {
+      animation: select-pop 0.28s var(--ease-la28);
+    }
+
+    @keyframes select-pop {
+      0%   { transform: scale(1); }
+      45%  { transform: scale(1.06); }
+      100% { transform: scale(1); }
+    }
+
+    /* --- Crowd badge attention: high/extreme gently pulse so they read as urgent --- */
+    .badge.crowd-high,
+    .badge.crowd-extreme {
+      animation: badge-pulse 2.4s var(--ease-la28) infinite;
+    }
+
+    @keyframes badge-pulse {
+      0%, 100% { opacity: 1; }
+      50%      { opacity: 0.72; }
+    }
+
+    /* --- Form input focus: line grows in from center on focus --- */
+    .form-group input,
+    .form-group textarea,
+    .form-group select,
+    .text-input {
+      background-image: linear-gradient(var(--accent), var(--accent));
+      background-size: 0% 2px;
+      background-repeat: no-repeat;
+      background-position: center 100%;
+      transition: border-color 0.2s var(--ease-la28), background-size 0.25s var(--ease-la28);
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus,
+    .text-input:focus {
+      background-size: 100% 2px;
+    }
+
+    /* --- Modal entry: scale + fade so it lands instead of jumping --- */
+    .modal-overlay {
+      transition: opacity 0.22s var(--ease-la28);
+      opacity: 0;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+    }
+
+    .modal-overlay.active .modal-content,
+    .modal-overlay.active .modal-card {
+      animation: modal-in 0.32s var(--ease-la28);
+    }
+
+    @keyframes modal-in {
+      0%   { opacity: 0; transform: translateY(16px) scale(0.96); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* --- Mapbox popup: fade + tiny rise instead of popping in --- */
+    .mapboxgl-popup {
+      animation: popup-in 0.18s var(--ease-la28);
+    }
+
+    @keyframes popup-in {
+      0%   { opacity: 0; transform: translateY(4px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* --- Top-bar dismiss: small rotate so the X feels like a button --- */
+    .top-bar-dismiss {
+      transition: opacity 0.2s var(--ease-la28), transform 0.2s var(--ease-la28);
+    }
+
+    .top-bar-dismiss:hover {
+      transform: translateY(-50%) rotate(90deg);
+    }
+
+    /* --- Sidebar credential button: lift + soft glow on hover --- */
+    .credential-btn {
+      transition:
+        filter 0.2s var(--ease-la28),
+        transform 0.18s var(--ease-la28),
+        box-shadow 0.22s var(--ease-la28);
+    }
+
+    .credential-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(255, 1, 143, 0.28);
+    }
+
+    /* --- Card hover glow trace ---
+       A teal stroke traces the card's perimeter outward from the mouse-entry
+       point in both directions, meeting at the antipode. JS wires up an SVG
+       overlay per card and sets stroke-dashoffset to the entry point so the
+       trace originates wherever the cursor came in. */
+    .card,
+    .explore-card {
+      position: relative;
+    }
+
+    .card-glow-svg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: visible;
+      z-index: 2;
+    }
+
+    .card-glow-svg rect {
+      fill: none;
+      stroke: #26d9c9;
+      stroke-width: 1.5;
+      stroke-dasharray: 0 100;
+      filter:
+        drop-shadow(0 0 3px #26d9c9)
+        drop-shadow(0 0 9px rgba(38, 217, 201, 0.55));
+    }
+
+    /* --- Generic focus-visible ring for keyboard users (accessibility) --- */
+    .btn-primary:focus-visible,
+    .btn-add:focus-visible,
+    .btn-close:focus-visible,
+    .btn-outline:focus-visible,
+    .credential-btn:focus-visible,
+    .pill:focus-visible,
+    .calendar-day:focus-visible,
+    .interest-card:focus-visible,
+    .map-control-toggle:focus-visible,
+    .nav-item:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
   </style>
 </head>
 
@@ -2381,6 +2762,20 @@
           <button class="map-control-toggle active" onclick="toggleMapLayer('venues')">Venues</button>
           <button class="map-control-toggle active" onclick="toggleMapLayer('stations')">Stations</button>
           <button class="map-control-toggle" onclick="toggleMapLayer('pois')">Food & POIs</button>
+          <div class="map-control-divider"></div>
+          <div class="map-control-label">Events by Day</div>
+          <select id="mapDayFilter" class="map-day-filter" onchange="setMapDayFilter(this.value)">
+            <option value="">All days</option>
+          </select>
+        </div>
+        <div class="map-legend" id="mapLegend">
+          <div class="map-legend-title">Legend</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#009ed6;"></span>Event Venues</div>
+          <div class="legend-item"><span class="legend-ring"></span>Metro Stations</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#ff470f;"></span>Food &amp; Dining</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#22c55e;"></span>Activities</div>
+          <div class="map-legend-subtitle">Metro Lines</div>
+          <div id="legendLines" class="legend-lines"></div>
         </div>
         <div id="venueDetailPanel" class="venue-detail" style="display:none;"></div>
       </div>
@@ -4144,12 +4539,33 @@ function buildScheduleFromOfficial() {
 
 function getCrowdLabel(level) {
   var labels = {
-    low: 'Low crowds',
+    low: 'Low',
     moderate: 'Moderate',
     high: 'Busy',
-    extreme: 'Very busy',
+    extreme: 'Packed',
   };
   return labels[level] || level;
+}
+
+// Signal-bar icon (1–4 ascending bars), filled to match the crowd level.
+// Inherits the badge's text color via fill="currentColor".
+function getCrowdIcon(level) {
+  var levelMap = { low: 1, moderate: 2, high: 3, extreme: 4 };
+  var n = levelMap[level] || 0;
+  var bars = '';
+  for (var i = 0; i < 4; i++) {
+    var h = 3 + i * 2;          // 3, 5, 7, 9
+    var y = 10 - h;
+    var active = i < n;
+    bars += '<rect x="' + (i * 3) + '" y="' + y + '" width="2" height="' + h +
+            '" rx="0.5" fill="currentColor" opacity="' + (active ? 1 : 0.25) + '"/>';
+  }
+  return '<svg width="11" height="10" viewBox="0 0 11 10" aria-hidden="true">' + bars + '</svg>';
+}
+
+// Build the full inner HTML for a crowd badge: icon + label.
+function getCrowdBadgeHTML(level) {
+  return getCrowdIcon(level) + '<span>' + getCrowdLabel(level) + '</span>';
 }
 
 function getLineColor(lineId) {
@@ -4384,6 +4800,7 @@ const DEFAULT_STATE = {
 
   // Map
   mapLayers: { lines: true, venues: true, stations: true, pois: false },
+  mapDayFilter: '', // '' = all days, otherwise stringified day number from SCHEDULE
   selectedVenue: null,
   map: null, // not persisted
   mapMarkers: [], // not persisted
@@ -5173,7 +5590,7 @@ function renderToday() {
             '<div class="journey-time"><div class="journey-time-big">' + ev.time + '</div>' +
             '<div class="journey-time-small">' + ev.date + '</div></div></div>' +
             '<div class="journey-details">' + ev.venue + '</div>' +
-            '<div class="journey-footer"><span class="badge crowd-' + ev.crowd + '">' + getCrowdLabel(ev.crowd) + '</span></div>' +
+            '<div class="journey-footer"><span class="badge crowd-' + ev.crowd + '">' + getCrowdBadgeHTML(ev.crowd) + '</span></div>' +
             '</div></div>';
         }).join('') + '</div>';
     }
@@ -5277,7 +5694,7 @@ function renderScheduleEvents() {
       '<div class="event-info"><div class="event-sport">' + ev.icon + ' ' + ev.sport + '</div>' +
       '<div class="event-round">' + ev.round + '</div>' +
       '<div class="event-venue">' + ev.venue + '</div></div>' +
-      '<span class="badge crowd-' + ev.crowd + '">' + getCrowdLabel(ev.crowd) + '</span>' +
+      '<span class="badge crowd-' + ev.crowd + '">' + getCrowdBadgeHTML(ev.crowd) + '</span>' +
       '<div style="text-align:right;font-size:12px;">' +
       '<div style="color:' + (ev.tickets === 'Sold Out' ? 'var(--error)' : ev.tickets === 'Limited' ? 'var(--la28-orange)' : 'var(--la28-green)') + ';font-family:var(--font-bold);">' + ev.tickets + '</div>' +
       (inTrip ? '<div style="color:var(--accent);font-size:11px;margin-top:2px;">In Trip ✓</div>' : '') +
@@ -5303,7 +5720,7 @@ function openEventDetail(eventId) {
   document.getElementById('modalVenue').textContent = ev.venue;
   document.getElementById('modalZone').textContent = ev.venueZone;
   document.getElementById('modalCrowd').className = 'badge crowd-' + ev.crowd;
-  document.getElementById('modalCrowd').textContent = getCrowdLabel(ev.crowd);
+  document.getElementById('modalCrowd').innerHTML = getCrowdBadgeHTML(ev.crowd);
   document.getElementById('modalTickets').textContent = ev.tickets;
 
   // Transit info
@@ -5443,7 +5860,7 @@ function renderTripBrowse() {
       '<div class="event-time">' + ev.time + '</div>' +
       '<div class="event-info"><div class="event-sport">' + ev.icon + ' ' + ev.sport + '</div>' +
       '<div class="event-round">' + ev.round + '</div></div>' +
-      '<span class="badge crowd-' + ev.crowd + '">' + getCrowdLabel(ev.crowd) + '</span>' +
+      '<span class="badge crowd-' + ev.crowd + '">' + getCrowdBadgeHTML(ev.crowd) + '</span>' +
       '<button onclick="' + (inTrip ? "removeFromTrip('" + ev.id + "');renderTripPlanner();renderToday();" : "addToTrip('" + ev.id + "');renderTripPlanner();renderToday();") + '" ' +
       'class="' + (inTrip ? 'btn-close' : 'btn-add') + '" style="padding:6px 12px;font-size:12px;">' +
       (inTrip ? 'Remove' : 'Add') + '</button></div>';
@@ -5733,8 +6150,7 @@ function showMap() {
   }
 
   // First-time init
-  var token = ['pk.eyJ1IjoiYmthc2UyNSIsImEiOiJjbW', 'l4YjNodmUxOGptM3dwdzkycnZ3YTR5In0', '.X7AMyn-wf47WxFyaNegjFA'].join('');
-  mapboxgl.accessToken = token;
+  mapboxgl.accessToken = 'pk.eyJ1IjoiYmthc2UyNSIsImEiOiJjbW14YjNodmUxOGptM3dwdzkycnZ3YTR5In0.X7AMyn-wf47WxFyaNegjFA';
 
   var isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   var style = isDark ? 'mapbox://styles/mapbox/dark-v11' : 'mapbox://styles/mapbox/light-v11';
@@ -5783,9 +6199,18 @@ window.addEventListener('resize', function () {
 
 function renderMapLayers() {
   if (!STATE.map || !_mapInitialized) return;
-  // Clear existing markers
+
+  // Clear any legacy DOM markers (no longer used, but harmless if empty)
   STATE.mapMarkers.forEach(function(m) { m.remove(); });
   STATE.mapMarkers = [];
+
+  // Clear native point layers/sources
+  ['stations-dots', 'venues-dots', 'pois-dots'].forEach(function(id) {
+    if (STATE.map.getLayer(id)) STATE.map.removeLayer(id);
+  });
+  ['stations-src', 'venues-src', 'pois-src'].forEach(function(id) {
+    if (STATE.map.getSource(id)) STATE.map.removeSource(id);
+  });
 
   // Clear existing line sources/layers (guarded — map style must be ready)
   try {
@@ -5849,90 +6274,179 @@ function renderMapLayers() {
     });
   }
 
-  // Stations
+  // Helper: wire hover feature-state + pointer cursor on a point layer
+  function wireHover(layerId, sourceId) {
+    var hoveredId = null;
+    STATE.map.on('mousemove', layerId, function(e) {
+      if (!e.features || !e.features.length) return;
+      if (hoveredId !== null) {
+        STATE.map.setFeatureState({ source: sourceId, id: hoveredId }, { hover: false });
+      }
+      hoveredId = e.features[0].id;
+      STATE.map.setFeatureState({ source: sourceId, id: hoveredId }, { hover: true });
+      STATE.map.getCanvas().style.cursor = 'pointer';
+    });
+    STATE.map.on('mouseleave', layerId, function() {
+      if (hoveredId !== null) {
+        STATE.map.setFeatureState({ source: sourceId, id: hoveredId }, { hover: false });
+      }
+      hoveredId = null;
+      STATE.map.getCanvas().style.cursor = '';
+    });
+  }
+
+  // Stations — native circle layer (no lag during pan/zoom)
   if (STATE.mapLayers.stations) {
+    var stationFeatures = [];
+    var sId = 0;
     Object.keys(METRO_STATIONS).forEach(function(lineId) {
       var lineColor = getLineColor(lineId);
       METRO_STATIONS[lineId].forEach(function(station) {
         if (typeof station.lat !== 'number' || typeof station.lng !== 'number') return;
-        var el = document.createElement('div');
-        el.className = 'station-dot';
-        el.style.borderColor = lineColor;
-        el.style.background = 'var(--surface)';
-        el.title = station.name + ' (' + lineId + ' Line)';
-        var popup = new mapboxgl.Popup({ offset: 10, closeButton: true }).setHTML(
+        stationFeatures.push({
+          type: 'Feature',
+          id: sId++,
+          geometry: { type: 'Point', coordinates: [station.lng, station.lat] },
+          properties: { name: station.name, lineId: lineId, color: lineColor }
+        });
+      });
+    });
+    STATE.map.addSource('stations-src', {
+      type: 'geojson',
+      data: { type: 'FeatureCollection', features: stationFeatures }
+    });
+    STATE.map.addLayer({
+      id: 'stations-dots',
+      type: 'circle',
+      source: 'stations-src',
+      paint: {
+        'circle-radius': ['case', ['boolean', ['feature-state', 'hover'], false], 7, 4.5],
+        'circle-color': '#ffffff',
+        'circle-stroke-color': ['get', 'color'],
+        'circle-stroke-width': ['case', ['boolean', ['feature-state', 'hover'], false], 3, 2],
+        'circle-radius-transition': { duration: 150 },
+        'circle-stroke-width-transition': { duration: 150 }
+      }
+    });
+    wireHover('stations-dots', 'stations-src');
+    STATE.map.on('click', 'stations-dots', function(e) {
+      var f = e.features && e.features[0];
+      if (!f) return;
+      var p = f.properties;
+      new mapboxgl.Popup({ offset: 10, closeButton: true })
+        .setLngLat(f.geometry.coordinates.slice())
+        .setHTML(
           '<div style="font-family:var(--font-bold);">' +
-            '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + lineColor + ';margin-right:6px;vertical-align:middle;"></span>' +
-            station.name +
+            '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + p.color + ';margin-right:6px;vertical-align:middle;"></span>' +
+            p.name +
           '</div>' +
-          '<div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">' + lineId + ' Line</div>'
-        );
-        var marker = new mapboxgl.Marker({ element: el })
-          .setLngLat([station.lng, station.lat])
-          .setPopup(popup)
-          .addTo(STATE.map);
-        STATE.mapMarkers.push(marker);
-      });
-    });
-  }
-
-  // Venues
-  if (STATE.mapLayers.venues) {
-    VENUES.forEach(function(venue) {
-      if (venue.remote) return; // skip remote venues (off-map)
-      if (typeof venue.lat !== 'number' || typeof venue.lng !== 'number') return;
-      var el = document.createElement('div');
-      el.className = 'venue-dot';
-      el.title = venue.name;
-      // Venue marker click opens the detail panel too (in addition to the popup)
-      el.addEventListener('click', function(ev) {
-        ev.stopPropagation();
-        showVenueDetail(venue.id);
-      });
-      var sportsHtml = venue.sports.map(function(sid) {
-        var s = SPORTS.find(function(sp) { return sp.id === sid; });
-        return s ? s.icon + ' ' + s.name : sid;
-      }).join('<br>');
-      var linesHtml = (venue.lines && venue.lines.length > 0)
-        ? '<div style="margin-top:6px;display:flex;gap:4px;">' +
-            venue.lines.map(function(l) {
-              return '<span class="badge transit" style="background:' + getLineColor(l) + ';font-size:10px;width:20px;height:20px;">' + l + '</span>';
-            }).join('') +
-          '</div>'
-        : '';
-      var popup = new mapboxgl.Popup({ offset: 12, maxWidth: '260px', closeButton: true }).setHTML(
-        '<div style="font-family:var(--font-bold);margin-bottom:4px;">' + venue.name + '</div>' +
-        '<div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px;">' + venue.zone + ' · ' + venue.capacity.toLocaleString() + ' capacity</div>' +
-        '<div style="font-size:11px;">' + sportsHtml + '</div>' +
-        linesHtml +
-        '<button style="margin-top:8px;width:100%;padding:6px 10px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-family:var(--font-bold);font-size:11px;cursor:pointer;" onclick="showVenueDetail(\'' + venue.id + '\')">View Details</button>'
-      );
-      var marker = new mapboxgl.Marker({ element: el })
-        .setLngLat([venue.lng, venue.lat])
-        .setPopup(popup)
+          '<div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">' + p.lineId + ' Line</div>'
+        )
         .addTo(STATE.map);
-      STATE.mapMarkers.push(marker);
     });
   }
 
-  // POIs
+  // Venues — native circle layer, click opens the detail panel
+  if (STATE.mapLayers.venues) {
+    // If a day filter is active, only include venues that host at least one
+    // event on that day. Match by venue name (events store the venue string).
+    var allowedVenueNames = null;
+    if (STATE.mapDayFilter) {
+      var dayNum = parseInt(STATE.mapDayFilter, 10);
+      var day = SCHEDULE.find(function(d) { return d.day === dayNum; });
+      if (day) {
+        allowedVenueNames = {};
+        day.events.forEach(function(e) { allowedVenueNames[e.venue] = true; });
+      }
+    }
+    var venueFeatures = [];
+    var vId = 0;
+    VENUES.forEach(function(venue) {
+      if (venue.remote) return;
+      if (typeof venue.lat !== 'number' || typeof venue.lng !== 'number') return;
+      if (allowedVenueNames && !allowedVenueNames[venue.name]) return;
+      venueFeatures.push({
+        type: 'Feature',
+        id: vId++,
+        geometry: { type: 'Point', coordinates: [venue.lng, venue.lat] },
+        properties: { venueId: venue.id, name: venue.name }
+      });
+    });
+    STATE.map.addSource('venues-src', {
+      type: 'geojson',
+      data: { type: 'FeatureCollection', features: venueFeatures }
+    });
+    STATE.map.addLayer({
+      id: 'venues-dots',
+      type: 'circle',
+      source: 'venues-src',
+      paint: {
+        'circle-radius': ['case', ['boolean', ['feature-state', 'hover'], false], 10, 7],
+        'circle-color': '#009ed6',
+        'circle-stroke-color': 'rgba(0, 158, 214, 0.35)',
+        'circle-stroke-width': ['case', ['boolean', ['feature-state', 'hover'], false], 6, 3],
+        'circle-radius-transition': { duration: 150 },
+        'circle-stroke-width-transition': { duration: 150 }
+      }
+    });
+    wireHover('venues-dots', 'venues-src');
+    STATE.map.on('click', 'venues-dots', function(e) {
+      var f = e.features && e.features[0];
+      if (!f) return;
+      showVenueDetail(f.properties.venueId);
+    });
+  }
+
+  // POIs — native circle layer
   if (STATE.mapLayers.pois) {
+    var poiFeatures = [];
+    var pId = 0;
     TRANSIT_POIS.forEach(function(poi) {
       if (typeof poi.lat !== 'number' || typeof poi.lng !== 'number') return;
-      var el = document.createElement('div');
-      el.className = 'poi-dot';
-      el.style.background = poi.type === 'food' ? 'var(--la28-orange)' : 'var(--la28-green)';
-      el.title = poi.name;
-      var popup = new mapboxgl.Popup({ offset: 8, maxWidth: '220px', closeButton: true }).setHTML(
-        '<div style="font-family:var(--font-bold);margin-bottom:2px;">' + poi.name + '</div>' +
-        '<div style="font-size:11px;color:var(--text-secondary);">' + (poi.cuisine || poi.description || '') + '</div>' +
-        '<div style="font-size:11px;color:var(--text-tertiary);margin-top:4px;">' + poi.walkMin + ' min walk from ' + poi.nearestStation + '</div>'
-      );
-      var marker = new mapboxgl.Marker({ element: el })
-        .setLngLat([poi.lng, poi.lat])
-        .setPopup(popup)
+      poiFeatures.push({
+        type: 'Feature',
+        id: pId++,
+        geometry: { type: 'Point', coordinates: [poi.lng, poi.lat] },
+        properties: {
+          name: poi.name,
+          type: poi.type || '',
+          cuisine: poi.cuisine || '',
+          description: poi.description || '',
+          walkMin: poi.walkMin,
+          nearestStation: poi.nearestStation
+        }
+      });
+    });
+    STATE.map.addSource('pois-src', {
+      type: 'geojson',
+      data: { type: 'FeatureCollection', features: poiFeatures }
+    });
+    STATE.map.addLayer({
+      id: 'pois-dots',
+      type: 'circle',
+      source: 'pois-src',
+      paint: {
+        'circle-radius': ['case', ['boolean', ['feature-state', 'hover'], false], 8, 5],
+        'circle-color': ['case', ['==', ['get', 'type'], 'food'], '#ff470f', '#22c55e'],
+        'circle-stroke-color': '#ffffff',
+        'circle-stroke-width': ['case', ['boolean', ['feature-state', 'hover'], false], 3, 1.5],
+        'circle-radius-transition': { duration: 150 },
+        'circle-stroke-width-transition': { duration: 150 }
+      }
+    });
+    wireHover('pois-dots', 'pois-src');
+    STATE.map.on('click', 'pois-dots', function(e) {
+      var f = e.features && e.features[0];
+      if (!f) return;
+      var p = f.properties;
+      new mapboxgl.Popup({ offset: 8, maxWidth: '220px', closeButton: true })
+        .setLngLat(f.geometry.coordinates.slice())
+        .setHTML(
+          '<div style="font-family:var(--font-bold);margin-bottom:2px;">' + p.name + '</div>' +
+          '<div style="font-size:11px;color:var(--text-secondary);">' + (p.cuisine || p.description || '') + '</div>' +
+          '<div style="font-size:11px;color:var(--text-tertiary);margin-top:4px;">' + p.walkMin + ' min walk from ' + p.nearestStation + '</div>'
+        )
         .addTo(STATE.map);
-      STATE.mapMarkers.push(marker);
     });
   }
 }
@@ -6041,6 +6555,42 @@ function toggleMapLayer(layer) {
   }
 }
 
+// Called when the user changes the "Events by Day" dropdown on the map.
+function setMapDayFilter(value) {
+  STATE.mapDayFilter = value || '';
+  saveState();
+  if (STATE.map && _mapInitialized) {
+    renderMapLayers();
+  }
+}
+
+// Populate the day-filter dropdown from SCHEDULE.
+function populateMapDayFilter() {
+  var sel = document.getElementById('mapDayFilter');
+  if (!sel || sel._populated) return;
+  SCHEDULE.forEach(function(day) {
+    var opt = document.createElement('option');
+    opt.value = String(day.day);
+    opt.textContent = 'Day ' + day.day + ' — ' + day.dayOfWeek + ', ' + day.date;
+    sel.appendChild(opt);
+  });
+  sel.value = STATE.mapDayFilter || '';
+  sel._populated = true;
+}
+
+// Populate the Metro Lines section of the legend from METRO_LINES.
+function populateMapLegend() {
+  var host = document.getElementById('legendLines');
+  if (!host || host._populated) return;
+  host.innerHTML = METRO_LINES.map(function(line) {
+    return '<div class="legend-line" title="' + line.name + ' — ' + line.route + '">' +
+             '<span class="legend-line-swatch" style="background:' + line.color + ';"></span>' +
+             line.id +
+           '</div>';
+  }).join('');
+  host._populated = true;
+}
+
 // Override switchView to lazy-init the map when the transit tab first becomes visible
 // and to resize the map when the user returns to the tab.
 var _origSwitchView = switchView;
@@ -6072,8 +6622,123 @@ switchView = function(view) {
 // ============================================================
 // BOOTSTRAP
 // ============================================================
+// ----- CARD HOVER GLOW -----
+// Traces a teal stroke around the card outward in both directions from the
+// mouse-entry point, meeting at the antipode. We use a SINGLE dash whose
+// length grows from 0 to 100 (= full perimeter) while its offset shifts so
+// that the dash stays centered on the entry point throughout. Animating
+// stroke-dasharray and stroke-dashoffset in lockstep is what produces the
+// bidirectional growth — a single dash can only grow forward along the path,
+// so we slide its starting position backward at half speed to keep its
+// midpoint pinned at entry.
+function attachCardGlow(card) {
+  if (card._glowReady) return;
+  card._glowReady = true;
+
+  var SVG_NS = 'http://www.w3.org/2000/svg';
+  var svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('class', 'card-glow-svg');
+  svg.setAttribute('aria-hidden', 'true');
+  var rect = document.createElementNS(SVG_NS, 'rect');
+  svg.appendChild(rect);
+  card.appendChild(svg);
+
+  var lastPct = 0;
+
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+  // Convert a cursor position into a 0–100 percentage along the SVG rect's
+  // path. The rect path starts at (radius, 0) and goes clockwise, so:
+  //   top edge (left → right), top-right arc, right edge (top → bottom),
+  //   bottom-right arc, bottom edge (right → left), bottom-left arc,
+  //   left edge (bottom → top), top-left arc.
+  // Each arc has length π·r/2; we divide each segment's true length by the
+  // true total perimeter, so the result is geometrically accurate even for
+  // non-square cards.
+  function entryPct(mx, my, w, h, r) {
+    var arc = Math.PI * r / 2;
+    var perimeter = 2 * (w - 2 * r) + 2 * (h - 2 * r) + 4 * arc;
+
+    var dt = my, dr = w - mx, db = h - my, dl = mx;
+    var minD = Math.min(dt, dr, db, dl);
+    var d;
+    if (minD === dt) {
+      d = clamp(mx, r, w - r) - r;
+    } else if (minD === dr) {
+      d = (w - 2 * r) + arc + (clamp(my, r, h - r) - r);
+    } else if (minD === db) {
+      d = (w - 2 * r) + arc + (h - 2 * r) + arc
+          + ((w - r) - clamp(mx, r, w - r));
+    } else {
+      d = 2 * (w - 2 * r) + 3 * arc
+          + ((h - r) - clamp(my, r, h - r));
+    }
+    return (d / perimeter) * 100;
+  }
+
+  card.addEventListener('mouseenter', function(ev) {
+    var b = card.getBoundingClientRect();
+    var w = b.width, h = b.height;
+    if (w < 10 || h < 10) return;
+
+    var radius = parseFloat(getComputedStyle(card).borderRadius) || 8;
+    svg.setAttribute('width', w);
+    svg.setAttribute('height', h);
+    svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+    rect.setAttribute('x', 0);
+    rect.setAttribute('y', 0);
+    rect.setAttribute('width', w);
+    rect.setAttribute('height', h);
+    rect.setAttribute('rx', radius);
+    rect.setAttribute('pathLength', '100');
+
+    var pct = entryPct(ev.clientX - b.left, ev.clientY - b.top, w, h, radius);
+    lastPct = pct;
+
+    // Snap (no transition) to: zero-length dash positioned at entry.
+    rect.style.transition = 'none';
+    rect.style.strokeDashoffset = -pct;
+    rect.style.strokeDasharray = '0 100';
+    void rect.getBoundingClientRect();  // force reflow
+
+    // Animate to: full-perimeter dash whose center is still at entry.
+    // Dashoffset moves from -pct to (50 - pct) — i.e., the dash's start
+    // slides backward by 50 units while its length grows by 100 units, so
+    // its midpoint stays put.
+    rect.style.transition =
+      'stroke-dasharray 0.38s var(--ease-la28),' +
+      'stroke-dashoffset 0.38s var(--ease-la28)';
+    rect.style.strokeDashoffset = 50 - pct;
+    rect.style.strokeDasharray = '100 0';
+  });
+
+  card.addEventListener('mouseleave', function() {
+    // Retract back toward the entry point.
+    rect.style.transition =
+      'stroke-dasharray 0.22s var(--ease-la28),' +
+      'stroke-dashoffset 0.22s var(--ease-la28)';
+    rect.style.strokeDashoffset = -lastPct;
+    rect.style.strokeDasharray = '0 100';
+  });
+}
+
+function scanCardsForGlow() {
+  document.querySelectorAll('.card, .explore-card').forEach(attachCardGlow);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   initializeApp();
+
+  // Populate the map day-filter dropdown and legend once schedule/lines exist.
+  try { populateMapDayFilter(); } catch (e) {}
+  try { populateMapLegend(); } catch (e) {}
+
+  // Initial pass + watch for cards added by later renders.
+  scanCardsForGlow();
+  var watchTarget = document.querySelector('.content-area') || document.body;
+  new MutationObserver(scanCardsForGlow).observe(watchTarget, {
+    childList: true, subtree: true
+  });
 });
 
 </script>
